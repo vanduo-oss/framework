@@ -10,7 +10,7 @@
 
 A lightweight, pure HTML/CSS/JS framework for designing beautiful static websites. No dependencies, no build tools, just clean and simple code.
 
-[**Browse Full Documentation &rarr;**](https://vanduo.dev/documentation.html)
+[**Browse Full Documentation &rarr;**]([https://vanduo.dev/#docs](https://vanduo.dev/#docs) 
 
 ## Features
 
@@ -155,7 +155,7 @@ Notes:
 
 Comprehensive documentation for all components, utilities, and customization options is available at vanduo.dev.
 
-[**View Documentation**](https://vanduo.dev/documentation.html)
+[**View Documentation**]([https://vanduo.dev/#docs](https://vanduo.dev/#docs)
 
 ### Key Capabilities
 
