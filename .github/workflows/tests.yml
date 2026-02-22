@@ -4,6 +4,10 @@ name: Tests
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
 
 permissions:
   contents: read
@@ -29,18 +33,25 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'pnpm'
+
+      - name: Enable Corepack
+        run: corepack enable
 
       - name: Install Playwright
         run: |
-          npm install -D @playwright/test
-          npx playwright install --with-deps
+          pnpm install --frozen-lockfile
+          pnpm exec playwright install --with-deps
 
       - name: Run tests
-        run: npx playwright test --project="${{ matrix.project }}"
+        run: pnpm exec playwright test --project="${{ matrix.project }}"
 
       - name: Upload test report
         uses: actions/upload-artifact@v4
@@ -68,18 +79,25 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'pnpm'
+
+      - name: Enable Corepack
+        run: corepack enable
 
       - name: Install Playwright
         run: |
-          npm install -D @playwright/test
-          npx playwright install --with-deps chromium
+          pnpm install --frozen-lockfile
+          pnpm exec playwright install --with-deps chromium
 
       - name: Run accessibility tests
-        run: npx playwright test --grep @a11y --project="Chromium Desktop"
+        run: pnpm exec playwright test --grep @a11y --project="Chromium Desktop"
 
       - name: Upload a11y report
         uses: actions/upload-artifact@v4
@@ -94,26 +112,32 @@ jobs:
     name: Tablet Tests
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'pnpm'
+
+      - name: Enable Corepack
+        run: corepack enable
 
       - name: Install Playwright
         run: |
-          npm install -D @playwright/test
-          npx playwright install --with-deps
+          pnpm install --frozen-lockfile
+          pnpm exec playwright install --with-deps
 
       - name: Run tablet tests
         run: |
-          npx playwright test --project="Chromium Tablet"
-          npx playwright test --project="WebKit Tablet"
+          pnpm exec playwright test --project="Chromium Tablet"
+          pnpm exec playwright test --project="WebKit Tablet"
 
       - name: Upload report
         uses: actions/upload-artifact@v4

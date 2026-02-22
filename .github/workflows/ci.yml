@@ -29,20 +29,21 @@ jobs:
           node-version: 20
           cache: 'pnpm'
 
+      - name: Enable Corepack
+        run: corepack enable
+
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
+
+      - name: Security audit
+        run: pnpm audit --audit-level=high
+        continue-on-error: false
 
       - name: Run CSS linting
         run: pnpm run lint:css
 
       - name: Run JS linting
         run: pnpm run lint:js
-
-      - name: Install Playwright browsers
-        run: pnpm exec playwright install --with-deps
-
-      - name: Run tests
-        run: pnpm test
 
       - name: Build production assets
         run: pnpm run build
