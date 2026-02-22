@@ -223,5 +223,24 @@ test.describe('Helper Functions @unit', () => {
       expect(result).not.toContain('<script>');
       expect(result).toContain('&lt;');
     });
+
+    test('sanitizeHtml() fails closed when DOMParser is unavailable', async ({ page }) => {
+      const result = await page.evaluate(() => {
+        const originalDOMParser = (window as any).DOMParser;
+        (window as any).DOMParser = function () {
+          throw new Error('DOMParser unavailable');
+        } as any;
+
+        try {
+          return (window as any).sanitizeHtml('<b>safe</b><script>alert(1)</script>');
+        } finally {
+          (window as any).DOMParser = originalDOMParser;
+        }
+      });
+
+      expect(result).toContain('&lt;b&gt;safe&lt;/b&gt;');
+      expect(result).toContain('&lt;script&gt;alert(1)&lt;/script&gt;');
+      expect(result).not.toContain('<script>');
+    });
   });
 });

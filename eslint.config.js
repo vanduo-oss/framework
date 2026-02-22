@@ -51,6 +51,16 @@ export default [
             }
         },
         rules: {
+            // Enforce modern declarations
+            'no-var': 'error',
+            'prefer-const': 'error',
+
+            // Require strict mode, allowing either global or function form
+            strict: ['error', 'safe'],
+
+            // Safer equality while allowing common null checks
+            eqeqeq: ['error', 'smart'],
+
             // Warn on unused vars but don't error
             'no-unused-vars': ['warn', {
                 argsIgnorePattern: '^_',
@@ -77,6 +87,10 @@ export default [
         files: ['js/index.js'],
         languageOptions: {
             sourceType: 'module'
+        },
+        rules: {
+            // ESM is always strict; no directive required
+            strict: 'off'
         }
     },
     {
@@ -84,7 +98,9 @@ export default [
         files: ['js/utils/helpers.js'],
         rules: {
             'no-redeclare': 'off',
-            'no-unused-vars': 'off'  // These are intentionally global utilities
+            'no-unused-vars': 'off',  // These are intentionally global utilities
+            // Helpers are top-level globals; strict is enforced by file directive.
+            strict: 'off'
         }
     },
     {

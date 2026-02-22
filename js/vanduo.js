@@ -1,6 +1,6 @@
 /**
  * Vanduo Framework - Main JavaScript File
- * v1.1.6
+ * v1.2.0
  */
 
 (function() {
@@ -10,7 +10,7 @@
    * Vanduo Framework Object
    */
   const Vanduo = {
-    version: '1.1.6',
+    version: '1.2.0',
     components: {},
 
     /**
@@ -51,7 +51,7 @@
         }
       });
 
-      console.log('Vanduo Framework v1.1.6 initialized');
+      console.log('Vanduo Framework v1.2.0 initialized');
     },
 
     /**
@@ -70,7 +70,7 @@
      * @param {string} name - Component name
      */
     reinit: function(name) {
-      var component = this.components[name];
+      const component = this.components[name];
       if (component && component.init && typeof component.init === 'function') {
         try {
           component.init();
@@ -86,9 +86,9 @@
      */
     destroyAll: function() {
       // First, destroy components that have their own destroyAll
-      var names = Object.keys(this.components);
-      for (var i = 0; i < names.length; i++) {
-        var component = this.components[names[i]];
+      const names = Object.keys(this.components);
+      for (let i = 0; i < names.length; i++) {
+        const component = this.components[names[i]];
         if (component && component.destroyAll && typeof component.destroyAll === 'function') {
           try {
             component.destroyAll();

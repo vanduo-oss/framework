@@ -23,7 +23,7 @@
         return sanitizeHtml(input);
       }
       // Fallback: strip all HTML
-      var div = document.createElement('div');
+      const div = document.createElement('div');
       div.textContent = input || '';
       return div.innerHTML;
     },

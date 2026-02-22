@@ -332,4 +332,56 @@ test.describe('Doc Search Component @component', () => {
       expect(result.searchResult).toContain('a');
     });
   });
+
+  test.describe('Callback isolation', () => {
+    test('contains thrown onSearch callback errors and still opens results', async ({ page }) => {
+      const pageErrors: string[] = [];
+      page.on('pageerror', (err) => pageErrors.push(err.message));
+
+      await page.evaluate(() => {
+        (window as any).Search.create({
+          containerSelector: '#test-search',
+          minQueryLength: 1,
+          debounceMs: 10,
+          onSearch: () => {
+            throw new Error('onSearch callback boom');
+          },
+        });
+
+        const input = document.querySelector('#test-search .vd-doc-search-input') as HTMLInputElement;
+        input.value = 'button';
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+      });
+
+      await page.waitForTimeout(80);
+      await expect(page.locator('#test-search .vd-doc-search-results')).toHaveClass(/is-open/);
+      expect(pageErrors).toEqual([]);
+    });
+
+    test('contains thrown onSelect callback errors and preserves control flow', async ({ page }) => {
+      const pageErrors: string[] = [];
+      page.on('pageerror', (err) => pageErrors.push(err.message));
+
+      await page.evaluate(() => {
+        (window as any).Search.create({
+          containerSelector: '#test-search',
+          minQueryLength: 1,
+          debounceMs: 10,
+          onSelect: () => {
+            throw new Error('onSelect callback boom');
+          },
+        });
+
+        const input = document.querySelector('#test-search .vd-doc-search-input') as HTMLInputElement;
+        input.value = 'button';
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+      });
+
+      await page.waitForTimeout(100);
+      await page.locator('#test-search .vd-doc-search-result').first().click();
+      await expect(page.locator('#test-search .vd-doc-search-input')).toHaveValue('');
+      await expect(page.locator('#test-search .vd-doc-search-results')).not.toHaveClass(/is-open/);
+      expect(pageErrors).toEqual([]);
+    });
+  });
 });

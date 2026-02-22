@@ -377,8 +377,10 @@
       // Apply syntax highlighting
       html = this.highlightHtml(html);
 
-      // Set content
-      pane.innerHTML = '<code>' + html + '</code>';
+      // Set content via DOM API to avoid string-based HTML insertion
+      const codeEl = document.createElement('code');
+      codeEl.innerHTML = html;
+      pane.replaceChildren(codeEl);
       pane.dataset.extracted = 'true';
     },
 
@@ -537,7 +539,7 @@
       // Wrap code content
       const codeWrapper = document.createElement('div');
       codeWrapper.className = 'vd-code-snippet-code';
-      codeWrapper.innerHTML = code.outerHTML;
+      codeWrapper.appendChild(code.cloneNode(true));
 
       // Replace code with new structure
       code.parentNode.removeChild(code);

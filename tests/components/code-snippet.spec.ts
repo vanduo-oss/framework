@@ -251,6 +251,27 @@ test.describe('Code Snippet Component @component', () => {
       const lineNumbers = page.locator('#line-numbers-snippet .vd-code-snippet-line-numbers');
       await expect(lineNumbers).toHaveAttribute('aria-hidden', 'true');
     });
+
+    test('wraps code using DOM node cloning (no string reinjection)', async ({ page }) => {
+      const result = await page.evaluate(() => {
+        const pane = document.querySelector('#line-numbers-snippet .has-line-numbers') as HTMLElement;
+        const wrapper = pane?.querySelector('.vd-code-snippet-code');
+        const code = wrapper?.querySelector('code');
+        return {
+          hasWrapper: Boolean(wrapper),
+          hasCodeElement: Boolean(code),
+          codeText: code?.textContent || '',
+          scriptCount: wrapper?.querySelectorAll('script').length || 0,
+          topLevelCodeCount: pane?.querySelectorAll(':scope > code').length || 0,
+        };
+      });
+
+      expect(result.hasWrapper).toBe(true);
+      expect(result.hasCodeElement).toBe(true);
+      expect(result.codeText).toContain('function greet(name)');
+      expect(result.scriptCount).toBe(0);
+      expect(result.topLevelCodeCount).toBe(0);
+    });
   });
 
   test.describe('Programmatic API', () => {

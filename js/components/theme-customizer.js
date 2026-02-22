@@ -483,28 +483,44 @@
      * Generate panel HTML
      */
     getPanelHTML: function () {
+      const esc = typeof escapeHtml === 'function'
+        ? escapeHtml
+        : function (text) {
+          const div = document.createElement('div');
+          div.textContent = String(text ?? '');
+          return div.innerHTML;
+        };
+      const safeColor = function (value) {
+        const normalized = String(value ?? '').trim();
+        // Allow common color formats used by palette values.
+        if (/^(#[0-9a-fA-F]{3,8}|rgb[a]?\([^)]{1,60}\)|hsl[a]?\([^)]{1,60}\)|var\(--[a-zA-Z0-9_-]{1,40}\))$/.test(normalized)) {
+          return normalized;
+        }
+        return '#000000';
+      };
+
       // Generate primary color swatches
       let primarySwatches = '';
       for (const [key, value] of Object.entries(this.PRIMARY_COLORS)) {
-        primarySwatches += `<button class="tc-color-swatch${key === this.state.primary ? ' is-active' : ''}" data-color="${key}" style="--swatch-color: ${value.color}" title="${value.name}"></button>`;
+        primarySwatches += `<button class="tc-color-swatch${key === this.state.primary ? ' is-active' : ''}" data-color="${esc(key)}" style="--swatch-color: ${safeColor(value.color)}" title="${esc(value.name)}"></button>`;
       }
 
       // Generate neutral color swatches
       let neutralSwatches = '';
       for (const [key, value] of Object.entries(this.NEUTRAL_COLORS)) {
-        neutralSwatches += `<button class="tc-neutral-swatch${key === this.state.neutral ? ' is-active' : ''}" data-neutral="${key}" style="--swatch-color: ${value.color}" title="${value.name}"><span>${value.name}</span></button>`;
+        neutralSwatches += `<button class="tc-neutral-swatch${key === this.state.neutral ? ' is-active' : ''}" data-neutral="${esc(key)}" style="--swatch-color: ${safeColor(value.color)}" title="${esc(value.name)}"><span>${esc(value.name)}</span></button>`;
       }
 
       // Generate radius buttons
       let radiusButtons = '';
       this.RADIUS_OPTIONS.forEach(r => {
-        radiusButtons += `<button class="tc-radius-btn${r === this.state.radius ? ' is-active' : ''}" data-radius="${r}">${r}</button>`;
+        radiusButtons += `<button class="tc-radius-btn${r === this.state.radius ? ' is-active' : ''}" data-radius="${esc(r)}">${esc(r)}</button>`;
       });
 
       // Generate font options
       let fontOptions = '';
       for (const [key, value] of Object.entries(this.FONT_OPTIONS)) {
-        fontOptions += `<option value="${key}"${key === this.state.font ? ' selected' : ''}>${value.name}</option>`;
+        fontOptions += `<option value="${esc(key)}"${key === this.state.font ? ' selected' : ''}>${esc(value.name)}</option>`;
       }
 
       // Generate mode buttons

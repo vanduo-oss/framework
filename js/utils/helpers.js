@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * Vanduo Framework - Utility Helpers
  * Common utility functions used across the framework
@@ -86,7 +88,11 @@ function on(target, event, handlerOrSelector, handler) {
     element.addEventListener(event, function (e) {
       const delegateTarget = e.target.closest(handlerOrSelector);
       if (delegateTarget && element.contains(delegateTarget)) {
-        handler.call(delegateTarget, e);
+        try {
+          handler.call(delegateTarget, e);
+        } catch (error) {
+          console.warn('[Vanduo Helpers] Delegated handler error:', error);
+        }
       }
     });
   }
@@ -238,7 +244,7 @@ function getPosition(element) {
  */
 function escapeHtml(str) {
   if (!str) return '';
-  var div = document.createElement('div');
+  const div = document.createElement('div');
   div.appendChild(document.createTextNode(str));
   return div.innerHTML;
 }
@@ -252,24 +258,30 @@ function escapeHtml(str) {
  */
 function sanitizeHtml(input) {
   if (!input) return '';
-  var doc = new DOMParser().parseFromString(input, 'text/html');
-  var allowed = ['B', 'STRONG', 'I', 'EM', 'BR', 'A', 'SPAN', 'U', 'SVG', 'PATH', 'LINE', 'CIRCLE', 'POLYLINE', 'RECT', 'G'];
+  let doc;
+  try {
+    doc = new DOMParser().parseFromString(input, 'text/html');
+  } catch (_error) {
+    // Fail closed to plain escaped text if parser is unavailable/fails.
+    return escapeHtml(input);
+  }
+  const allowed = ['B', 'STRONG', 'I', 'EM', 'BR', 'A', 'SPAN', 'U', 'SVG', 'PATH', 'LINE', 'CIRCLE', 'POLYLINE', 'RECT', 'G'];
 
-  var sanitizeNode = function (node) {
-    var children = Array.from(node.childNodes);
+  const sanitizeNode = function (node) {
+    const children = Array.from(node.childNodes);
     children.forEach(function (child) {
       if (child.nodeType === Node.TEXT_NODE) return;
 
       if (!allowed.includes(child.nodeName)) {
-        var text = document.createTextNode(child.textContent);
+        const text = document.createTextNode(child.textContent);
         node.replaceChild(text, child);
         return;
       }
 
       if (child.nodeName === 'A') {
-        var href = child.getAttribute('href') || '';
+        const href = child.getAttribute('href') || '';
         try {
-          var url = new URL(href, location.href);
+          const url = new URL(href, location.href);
           if (!['http:', 'https:', 'mailto:'].includes(url.protocol)) {
             child.removeAttribute('href');
           }
@@ -280,17 +292,17 @@ function sanitizeHtml(input) {
         child.removeAttribute('rel');
       } else if (child.nodeName === 'SVG' || child.closest && child.closest('svg')) {
         // Allow safe SVG presentation attributes only
-        var safeSvgAttrs = ['xmlns', 'width', 'height', 'viewBox', 'fill', 'stroke', 'stroke-width',
+        const safeSvgAttrs = ['xmlns', 'width', 'height', 'viewBox', 'fill', 'stroke', 'stroke-width',
           'stroke-linecap', 'stroke-linejoin', 'd', 'cx', 'cy', 'r', 'x1', 'y1', 'x2', 'y2', 'points',
           'transform', 'class'];
-        var attrs = Array.from(child.attributes || []);
+        const attrs = Array.from(child.attributes || []);
         attrs.forEach(function (a) {
           if (!safeSvgAttrs.includes(a.name)) {
             child.removeAttribute(a.name);
           }
         });
       } else {
-        var otherAttrs = Array.from(child.attributes || []);
+        const otherAttrs = Array.from(child.attributes || []);
         otherAttrs.forEach(function (a) { child.removeAttribute(a.name); });
       }
 
