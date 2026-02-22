@@ -1,5 +1,7 @@
 # Vanduo Framework v1.1.8
 
+[![NPM Version](https://img.shields.io/npm/v/vanduo-framework)](https://www.npmjs.com/package/vanduo-framework)
+
 **Essential just like water is.** 
 
 - **Pure HTML, CSS, JS** 
@@ -28,7 +30,19 @@ A lightweight, pure HTML/CSS/JS framework for designing beautiful static website
 
 ## Quick Start
 
-### Option 1: CDN (Fastest)
+### Option 1: Package Manager (Recommended)
+
+Install using your preferred package manager to easily integrate Vanduo with modern build tools and bundlers:
+
+```bash
+pnpm add vanduo-framework
+# or
+npm install vanduo-framework
+# or
+yarn add vanduo-framework
+```
+
+### Option 2: CDN (Fastest)
 
 Load directly from jsDelivr — no download required:
 
@@ -83,7 +97,7 @@ For dynamic DOM updates (SPAs), run cleanup before re-init:
 
 See [MIGRATION.md](MIGRATION.md) for complete upgrade guide.
 
-### Option 2: Download
+### Option 3: Download
 
 [**Download dist/ folder**](https://github.com/Nostromo-618/vanduo-framework/tree/main/dist) and include locally:
 
@@ -107,7 +121,7 @@ See [MIGRATION.md](MIGRATION.md) for complete upgrade guide.
 
 The `dist/` folder is **self-contained** (CSS, JS, Fonts, Icons).
 
-### Option 3: Source Files
+### Option 4: Source Files
 
 For development or when you need more control, use the unminified source:
 
