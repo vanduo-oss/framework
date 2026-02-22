@@ -19,7 +19,7 @@
 
 ## Overview
 
-A lightweight, pure HTML/CSS/JS framework for designing beautiful static websites. No dependencies, no build tools, just clean and simple code.
+A lightweight, pure HTML/CSS/JS framework for designing beautiful interfaces. Zero runtime dependencies, no mandatory build tools, just clean and simple code.
 
 [**Browse Full Documentation &rarr;**]([https://vanduo.dev/#docs](https://vanduo.dev/#docs) 
 
