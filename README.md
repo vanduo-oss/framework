@@ -93,29 +93,6 @@ Load directly from jsDelivr — no download required:
 <script>Vanduo.init();</script>
 ```
 
-### ⚠️ Breaking Changes in v1.1.0
-
-**CSS Class Prefixing:** All CSS classes now use the `vd-` prefix to prevent collisions with other frameworks:
-- `.btn` → `.vd-btn`
-- `.container` → `.vd-container`
-- `.card` → `.vd-card`
-- etc.
-
-**Manual Initialization:** Framework no longer auto-initializes. Explicitly call `Vanduo.init()` after loading:
-```html
-<script src="dist/vanduo.min.js"></script>
-<script>Vanduo.init();</script>
-```
-
-For dynamic DOM updates (SPAs), run cleanup before re-init:
-```html
-<script>
-    Vanduo.destroyAll();
-    Vanduo.init();
-</script>
-```
-
-See [MIGRATION.md](MIGRATION.md) for complete upgrade guide.
 
 ### Option 3: Download
 
