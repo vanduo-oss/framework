@@ -1,7 +1,7 @@
 # Vanduo Framework v1.1.8
 
 <p align="center">
-  <img src="images/vanduo-banner.png" alt="Vanduo Framework" width="100%">
+  <img src="vanduo-banner.svg" alt="Vanduo Framework Banner" width="100%">
 </p>
 
 <p align="center">
