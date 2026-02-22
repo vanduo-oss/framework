@@ -1,6 +1,15 @@
 # Vanduo Framework v1.1.8
 
-[![NPM Version](https://img.shields.io/npm/v/vanduo-framework)](https://www.npmjs.com/package/vanduo-framework)
+<p align="center">
+  <img src="images/vanduo-banner.png" alt="Vanduo Framework" width="100%">
+</p>
+
+<p align="center">
+  <a href="https://www.npmjs.com/package/vanduo-framework"><img src="https://img.shields.io/npm/v/vanduo-framework?style=flat-square&color=3b82f6" alt="NPM Version"></a>
+  <a href="https://github.com/Nostromo-618/vanduo-framework/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/Nostromo-618/vanduo-framework/ci.yml?branch=main&style=flat-square&color=10b981" alt="Build Status"></a>
+  <a href="https://github.com/Nostromo-618/vanduo-framework/blob/main/dist/vanduo.min.css"><img src="https://img.shields.io/badge/minified_size-~110kb-8b5cf6?style=flat-square" alt="Minified Size"></a>
+  <a href="https://github.com/Nostromo-618/vanduo-framework/blob/main/LICENSE"><img src="https://img.shields.io/github/license/Nostromo-618/vanduo-framework?style=flat-square&color=64748b" alt="License"></a>
+</p>
 
 **Essential just like water is.** 
 
@@ -25,6 +34,19 @@ A lightweight, pure HTML/CSS/JS framework for designing beautiful static website
 - 🌙 **Dark Mode** - Automatic OS preference detection + manual toggle
 - 🎛️ **Theme Customizer** - Real-time color, radius, font, and mode customization
 - 🔍 **SEO-Ready** - Comprehensive meta tags, structured data, and sitemap
+
+### The Vanduo Way
+Stop wrapping everything in bloated container DOMs. Build beautiful, accessible UI components with clean, predictable utility classes:
+
+```html
+<!-- Raw HTML -->
+<button>Click Me</button>
+
+<!-- With Vanduo Framework -->
+<button class="vd-btn vd-btn-primary vd-radius-full">
+  <i class="ph ph-sparkle"></i> Click Me
+</button>
+```
 
 ---
 
