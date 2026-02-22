@@ -7,7 +7,7 @@
 (function () {
   'use strict';
 
-  var supportsHas = (function () {
+  const supportsHas = (function () {
     try {
       return CSS.supports('selector(:has(*))');
     } catch (_e) {
@@ -18,14 +18,14 @@
   /**
    * Grid Layout Component
    */
-  var GridLayout = {
+  const GridLayout = {
     instances: new Map(),
 
     /**
      * Initialize all grid layout containers
      */
     init: function () {
-      var containers = document.querySelectorAll('[data-layout-mode]');
+      const containers = document.querySelectorAll('[data-layout-mode]');
 
       containers.forEach(function (container) {
         if (this.instances.has(container)) {
@@ -42,8 +42,8 @@
      * @param {HTMLElement} container - Element with data-layout-mode
      */
     initContainer: function (container) {
-      var mode = container.getAttribute('data-layout-mode') || 'standard';
-      var cleanupFunctions = [];
+      const mode = container.getAttribute('data-layout-mode') || 'standard';
+      const cleanupFunctions = [];
 
       this.applyMode(container, mode);
 
@@ -60,17 +60,17 @@
      * Initialize toggle buttons that target grid containers
      */
     initToggleButtons: function () {
-      var toggleButtons = document.querySelectorAll('[data-grid-toggle]');
+      const toggleButtons = document.querySelectorAll('[data-grid-toggle]');
 
       toggleButtons.forEach(function (button) {
         if (button.getAttribute('data-grid-initialized') === 'true') {
           return;
         }
 
-        var clickHandler = function (e) {
+        const clickHandler = function (e) {
           e.preventDefault();
-          var targetSelector = button.getAttribute('data-grid-toggle');
-          var target;
+          const targetSelector = button.getAttribute('data-grid-toggle');
+          let target;
 
           if (targetSelector) {
             target = document.querySelector(targetSelector);
@@ -102,10 +102,10 @@
     applyFibFallback: function (container) {
       if (supportsHas) return;
 
-      var rows = container.querySelectorAll('.vd-row, .row');
+      const rows = container.querySelectorAll('.vd-row, .row');
       rows.forEach(function (row) {
-        var cols = row.querySelectorAll(':scope > [class*="vd-col-"], :scope > [class*="col-"]');
-        var count = cols.length;
+        const cols = row.querySelectorAll(':scope > [class*="vd-col-"], :scope > [class*="col-"]');
+        const count = cols.length;
 
         if (count === 1) {
           row.style.gridTemplateColumns = '1fr';
@@ -126,7 +126,7 @@
      * @param {HTMLElement} container - Grid container
      */
     removeFibFallback: function (container) {
-      var rows = container.querySelectorAll('.vd-row, .row');
+      const rows = container.querySelectorAll('.vd-row, .row');
       rows.forEach(function (row) {
         row.style.gridTemplateColumns = '';
       });
@@ -152,11 +152,11 @@
       container.setAttribute('aria-label', 'Grid layout: ' + mode + ' mode');
 
       // Update associated toggle button states
-      var toggleButtons = document.querySelectorAll('[data-grid-toggle]');
+      const toggleButtons = document.querySelectorAll('[data-grid-toggle]');
       toggleButtons.forEach(function (btn) {
-        var targetSelector = btn.getAttribute('data-grid-toggle');
+        const targetSelector = btn.getAttribute('data-grid-toggle');
         if (targetSelector && container.matches(targetSelector)) {
-          var isActive = (mode === 'fibonacci');
+          const isActive = (mode === 'fibonacci');
           if (isActive) {
             btn.classList.add('is-active');
           } else {
@@ -167,13 +167,13 @@
       });
 
       // Store mode in instance
-      var instance = this.instances.get(container);
+      const instance = this.instances.get(container);
       if (instance) {
         instance.mode = mode;
       }
 
       // Dispatch custom event
-      var event;
+      let event;
       try {
         event = new CustomEvent('grid:modechange', {
           bubbles: true,
@@ -202,8 +202,8 @@
       }
       if (!container) return;
 
-      var currentMode = container.getAttribute('data-layout-mode') || 'standard';
-      var newMode = (currentMode === 'fibonacci') ? 'standard' : 'fibonacci';
+      const currentMode = container.getAttribute('data-layout-mode') || 'standard';
+      const newMode = (currentMode === 'fibonacci') ? 'standard' : 'fibonacci';
       this.applyMode(container, newMode);
     },
 
@@ -240,7 +240,7 @@
      * @param {HTMLElement} container - Grid container
      */
     destroy: function (container) {
-      var instance = this.instances.get(container);
+      const instance = this.instances.get(container);
       if (!instance) return;
 
       instance.cleanup.forEach(function (fn) { fn(); });
@@ -258,7 +258,7 @@
         this.destroy(container);
       }.bind(this));
 
-      var toggleButtons = document.querySelectorAll('[data-grid-initialized="true"]');
+      const toggleButtons = document.querySelectorAll('[data-grid-initialized="true"]');
       toggleButtons.forEach(function (button) {
         if (button._gridCleanup) {
           button._gridCleanup();

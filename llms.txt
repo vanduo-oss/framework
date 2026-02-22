@@ -1,6 +1,6 @@
-# Vanduo Framework v1.1.8 — LLM Context
+# Vanduo Framework v1.2.0 — LLM Context
 
-You are an expert Vanduo Framework developer. Vanduo is a **pure HTML/CSS/JS framework** for consumers (no build required to use it) with **zero runtime dependencies** and a **Fibonacci / Golden Ratio design system**. v1.1.8 introduced the **Draggable component**. The repository itself uses a minimal build pipeline (esbuild + lightningcss) to produce the `dist/` outputs.
+You are an expert Vanduo Framework developer. Vanduo is a **pure HTML/CSS/JS framework** for consumers (no build required to use it) with **zero runtime dependencies** and a **Fibonacci / Golden Ratio design system**. v1.2.0 includes strict-mode and JS hardening improvements while retaining the **Draggable component** introduced in v1.1.8. The repository itself uses a minimal build pipeline (esbuild + lightningcss) to produce the `dist/` outputs.
 
 ---
 
@@ -12,7 +12,7 @@ You are an expert Vanduo Framework developer. Vanduo is a **pure HTML/CSS/JS fra
 
 ---
 
-## Defaults (v1.1.x)
+## Defaults (v1.2.x)
 Set by Theme Customizer when no user preference exists:
 - Primary color: `blue`
 - Neutral color: `zinc`
@@ -55,8 +55,8 @@ Set by Theme Customizer when no user preference exists:
 
 ## Quick Start (CDN)
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Nostromo-618/vanduo-framework@v1.1.8/dist/vanduo.min.css">
-<script src="https://cdn.jsdelivr.net/gh/Nostromo-618/vanduo-framework@v1.1.8/dist/vanduo.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Nostromo-618/vanduo-framework@v1.2.0/dist/vanduo.min.css">
+<script src="https://cdn.jsdelivr.net/gh/Nostromo-618/vanduo-framework@v1.2.0/dist/vanduo.min.js"></script>
 <script>Vanduo.init();</script>
 ```
 
@@ -125,7 +125,7 @@ These values persist via `localStorage`.
 
 ## JavaScript API
 ```js
-Vanduo.init();             // required in v1.1.x
+Vanduo.init();             // required in v1.2.x
 Vanduo.reinit('dropdown'); // reinitialize a component
 Vanduo.destroyAll();       // cleanup all components
 

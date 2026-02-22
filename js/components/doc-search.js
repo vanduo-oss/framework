@@ -36,7 +36,7 @@
   /**
    * Default configuration
    */
-  var DEFAULTS = {
+  const DEFAULTS = {
     // Behavior
     minQueryLength: 2,
     maxResults: 10,
@@ -92,10 +92,10 @@
    * @returns {Object} Search instance
    */
   function createSearch(options) {
-    var config = Object.assign({}, DEFAULTS, options || {});
+    const config = Object.assign({}, DEFAULTS, options || {});
     
     // Instance state
-    var state = {
+    const state = {
       initialized: false,
       index: [],
       results: [],
@@ -108,6 +108,23 @@
       debounceTimer: null,
       boundHandlers: {}
     };
+
+    function safeInvokeCallback(name, fn, ...args) {
+      try {
+        fn(...args);
+      } catch (error) {
+        console.warn('[Vanduo Search] Callback error in "' + name + '":', error);
+      }
+    }
+
+    function setResultsHtml(html) {
+      if (!state.resultsContainer) return;
+      try {
+        state.resultsContainer.innerHTML = html;
+      } catch (error) {
+        console.warn('[Vanduo Search] Failed to render results:', error);
+      }
+    }
 
     /**
      * Initialize the search component
@@ -175,22 +192,22 @@
       }
 
       // Build from DOM
-      var sections = document.querySelectorAll(config.contentSelector);
-      var categoryMap = buildCategoryMap();
+      const sections = document.querySelectorAll(config.contentSelector);
+      const categoryMap = buildCategoryMap();
 
       sections.forEach(function(section) {
-        var id = section.id;
+        const id = section.id;
         if (!id) return;
 
-        var titleEl = section.querySelector(config.titleSelector);
-        var title = titleEl ? titleEl.textContent.replace(/v[\d.]+/g, '').trim() : id;
-        var category = categoryMap[id] || 'Documentation';
-        var content = extractContent(section);
-        var keywords = extractKeywords(section, title);
-        var iconEl = titleEl ? titleEl.querySelector('i.ph') : null;
-        var icon = '';
+        const titleEl = section.querySelector(config.titleSelector);
+        const title = titleEl ? titleEl.textContent.replace(/v[\d.]+/g, '').trim() : id;
+        const category = categoryMap[id] || 'Documentation';
+        const content = extractContent(section);
+        const keywords = extractKeywords(section, title);
+        const iconEl = titleEl ? titleEl.querySelector('i.ph') : null;
+        let icon = '';
         if (iconEl && iconEl.classList) {
-          for (var ci = 0; ci < iconEl.classList.length; ci++) {
+          for (let ci = 0; ci < iconEl.classList.length; ci++) {
             if (iconEl.classList[ci].indexOf('ph-') === 0) {
               icon = iconEl.classList[ci];
               break;
@@ -215,17 +232,17 @@
      * Build a map of section IDs to their categories
      */
     function buildCategoryMap() {
-      var map = {};
-      var currentCategory = 'Documentation';
-      var navItems = document.querySelectorAll(config.navSelector + ', ' + config.sectionSelector);
+      const map = {};
+      let currentCategory = 'Documentation';
+      const navItems = document.querySelectorAll(config.navSelector + ', ' + config.sectionSelector);
 
       navItems.forEach(function(item) {
         if (item.classList.contains('doc-nav-section')) {
           currentCategory = item.textContent.trim();
         } else {
-          var href = item.getAttribute('href');
+          const href = item.getAttribute('href');
           if (href && href.startsWith('#')) {
-            var id = href.substring(1);
+            const id = href.substring(1);
             map[id] = currentCategory;
           }
         }
@@ -238,14 +255,14 @@
      * Extract searchable content from a section
      */
     function extractContent(section) {
-      var clone = section.cloneNode(true);
+      const clone = section.cloneNode(true);
       
-      var toRemove = clone.querySelectorAll(config.excludeFromContent);
+      const toRemove = clone.querySelectorAll(config.excludeFromContent);
       toRemove.forEach(function(el) {
         el.remove();
       });
 
-      var text = clone.textContent || '';
+      let text = clone.textContent || '';
       text = text.replace(/\s+/g, ' ').trim();
       
       return text.substring(0, config.maxContentLength);
@@ -255,7 +272,7 @@
      * Extract keywords from a section
      */
     function extractKeywords(section, title) {
-      var keywords = [];
+      const keywords = [];
       
       // Add title words
       title.toLowerCase().split(/\s+/).forEach(function(word) {
@@ -265,10 +282,10 @@
       });
 
       // Add class names from code examples
-      var codeBlocks = section.querySelectorAll('code');
+      const codeBlocks = section.querySelectorAll('code');
       codeBlocks.forEach(function(code) {
-        var text = code.textContent || '';
-        var classMatches = text.match(/\.([\w-]+)/g);
+        const text = code.textContent || '';
+        const classMatches = text.match(/\.([\w-]+)/g);
         if (classMatches) {
           classMatches.forEach(function(match) {
             keywords.push(match.substring(1).toLowerCase());
@@ -277,9 +294,9 @@
       });
 
       // Add data attributes
-      var dataAttrs = section.querySelectorAll('[data-tooltip], [data-modal]');
+      const dataAttrs = section.querySelectorAll('[data-tooltip], [data-modal]');
       dataAttrs.forEach(function(el) {
-        var attrs = el.getAttributeNames().filter(function(name) {
+        const attrs = el.getAttributeNames().filter(function(name) {
           return name.startsWith('data-');
         });
         attrs.forEach(function(attr) {
@@ -294,7 +311,7 @@
      * Extract keywords from text string
      */
     function extractKeywordsFromText(text) {
-      var words = text.toLowerCase().split(/\s+/);
+      const words = text.toLowerCase().split(/\s+/);
       return words.filter(function(word) {
         return word.length > 2;
       });
@@ -336,9 +353,9 @@
         }
       };
       state.boundHandlers.handleResultClick = function(e) {
-        var result = e.target.closest('.vd-doc-search-result');
+        const result = e.target.closest('.vd-doc-search-result');
         if (result) {
-          var index = parseInt(result.dataset.index, 10);
+          const index = parseInt(result.dataset.index, 10);
           select(index);
         }
       };
@@ -378,7 +395,7 @@
      * Set up ARIA attributes
      */
     function setupAria() {
-      var resultsId = state.resultsContainer.id || 'search-results-' + Math.random().toString(36).substr(2, 9);
+      const resultsId = state.resultsContainer.id || 'search-results-' + Math.random().toString(36).substr(2, 9);
       state.resultsContainer.id = resultsId;
       
       state.input.setAttribute('role', 'combobox');
@@ -394,7 +411,7 @@
      * Handle input changes
      */
     function handleInput(e) {
-      var query = e.target.value.trim();
+      const query = e.target.value.trim();
 
       if (state.debounceTimer) {
         clearTimeout(state.debounceTimer);
@@ -415,7 +432,7 @@
 
         // Callback
         if (typeof config.onSearch === 'function') {
-          config.onSearch(query, state.results);
+          safeInvokeCallback('onSearch', config.onSearch, query, state.results);
         }
       }, config.debounceMs);
     }
@@ -469,16 +486,16 @@
      * Perform search
      */
     function search(query) {
-      var terms = query.toLowerCase().split(/\s+/).filter(function(t) {
+      const terms = query.toLowerCase().split(/\s+/).filter(function(t) {
         return t.length > 0;
       });
-      var scored = [];
+      const scored = [];
 
       state.index.forEach(function(entry) {
-        var score = 0;
-        var titleLower = entry.title.toLowerCase();
-        var categoryLower = entry.category.toLowerCase();
-        var contentLower = entry.content.toLowerCase();
+        let score = 0;
+        const titleLower = entry.title.toLowerCase();
+        const categoryLower = entry.category.toLowerCase();
+        const contentLower = entry.content.toLowerCase();
 
         terms.forEach(function(term) {
           // Title match - highest priority
@@ -497,7 +514,7 @@
           }
 
           // Keyword match
-          var keywordMatch = entry.keywords.some(function(k) {
+          const keywordMatch = entry.keywords.some(function(k) {
             return k.includes(term);
           });
           if (keywordMatch) {
@@ -536,16 +553,16 @@
      */
     function render() {
       if (state.results.length === 0) {
-        state.resultsContainer.innerHTML = renderEmpty();
+        setResultsHtml(renderEmpty());
         return;
       }
 
-      var html = '<ul class="vd-doc-search-results-list" role="listbox">';
+      let html = '<ul class="vd-doc-search-results-list" role="listbox">';
 
       state.results.forEach(function(result, index) {
-        var isActive = index === state.activeIndex;
-        var icon = result.icon || getCategoryIcon(result.categorySlug);
-        var excerpt = getExcerpt(result.content, state.query);
+        const isActive = index === state.activeIndex;
+        const icon = result.icon || getCategoryIcon(result.categorySlug);
+        const excerpt = getExcerpt(result.content, state.query);
 
         html += '<li class="vd-doc-search-result' + (isActive ? ' is-active' : '') + '"' +
           ' role="option"' +
@@ -568,7 +585,7 @@
       html += '</ul>';
       html += renderFooter();
 
-      state.resultsContainer.innerHTML = html;
+      setResultsHtml(html);
     }
 
     /**
@@ -604,13 +621,13 @@
      * Get excerpt from content
      */
     function getExcerpt(content, query) {
-      var terms = query.toLowerCase().split(/\s+/);
-      var contentLower = content.toLowerCase();
-      var excerptLength = 100;
+      const terms = query.toLowerCase().split(/\s+/);
+      const contentLower = content.toLowerCase();
+      const excerptLength = 100;
 
-      var matchPos = -1;
-      for (var i = 0; i < terms.length; i++) {
-        var pos = contentLower.indexOf(terms[i]);
+      let matchPos = -1;
+      for (let i = 0; i < terms.length; i++) {
+        const pos = contentLower.indexOf(terms[i]);
         if (pos !== -1 && (matchPos === -1 || pos < matchPos)) {
           matchPos = pos;
         }
@@ -620,9 +637,9 @@
         return content.substring(0, excerptLength) + '...';
       }
 
-      var start = Math.max(0, matchPos - 30);
-      var end = Math.min(content.length, matchPos + excerptLength);
-      var excerpt = content.substring(start, end);
+      const start = Math.max(0, matchPos - 30);
+      const end = Math.min(content.length, matchPos + excerptLength);
+      let excerpt = content.substring(start, end);
 
       if (start > 0) {
         excerpt = '...' + excerpt;
@@ -640,15 +657,15 @@
     function highlight(text, query) {
       if (!query) return escapeHtml(text);
 
-      var terms = query.toLowerCase().split(/\s+/).filter(function(t) {
+      const terms = query.toLowerCase().split(/\s+/).filter(function(t) {
         return t.length > 0;
       });
-      var escaped = escapeHtml(text);
+      let escaped = escapeHtml(text);
 
       terms.forEach(function(term) {
         // Skip overly long terms to prevent ReDoS
         if (term.length > 50) return;
-        var regex = new RegExp('(' + term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
+        const regex = new RegExp('(' + term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
         escaped = escaped.replace(regex, '<' + config.highlightTag + '>$1</' + config.highlightTag + '>');
       });
 
@@ -659,7 +676,7 @@
      * Escape HTML entities
      */
     function escapeHtml(text) {
-      var div = document.createElement('div');
+      const div = document.createElement('div');
       div.textContent = text;
       return div.innerHTML;
     }
@@ -668,7 +685,7 @@
      * Navigate results with keyboard
      */
     function navigate(direction) {
-      var newIndex = state.activeIndex + direction;
+      let newIndex = state.activeIndex + direction;
 
       if (newIndex < 0) {
         newIndex = state.results.length - 1;
@@ -683,7 +700,7 @@
      * Set active result index
      */
     function setActiveIndex(index) {
-      var prevActive = state.resultsContainer.querySelector('.vd-doc-search-result.is-active');
+      const prevActive = state.resultsContainer.querySelector('.vd-doc-search-result.is-active');
       if (prevActive) {
         prevActive.classList.remove('is-active');
         prevActive.setAttribute('aria-selected', 'false');
@@ -691,7 +708,7 @@
 
       state.activeIndex = index;
 
-      var newActive = state.resultsContainer.querySelector('[data-index="' + index + '"]');
+      const newActive = state.resultsContainer.querySelector('[data-index="' + index + '"]');
       if (newActive) {
         newActive.classList.add('is-active');
         newActive.setAttribute('aria-selected', 'true');
@@ -704,7 +721,7 @@
      * Select a result
      */
     function select(index) {
-      var result = state.results[index];
+      const result = state.results[index];
       if (!result) return;
 
       // Close search
@@ -714,12 +731,12 @@
 
       // Custom callback
       if (typeof config.onSelect === 'function') {
-        config.onSelect(result);
+        safeInvokeCallback('onSelect', config.onSelect, result);
         return;
       }
 
       // Default behavior: navigate to section
-      var section = document.querySelector(result.url);
+      const section = document.querySelector(result.url);
       if (section) {
         section.scrollIntoView({ behavior: 'smooth', block: 'start' });
         window.history.pushState(null, '', result.url);
@@ -731,7 +748,7 @@
      * Update sidebar navigation active state
      */
     function updateSidebarActive(sectionId) {
-      var navLinks = document.querySelectorAll(config.navSelector);
+      const navLinks = document.querySelectorAll(config.navSelector);
       navLinks.forEach(function(link) {
         link.classList.remove('active');
         if (link.getAttribute('href') === '#' + sectionId) {
@@ -751,7 +768,7 @@
       state.input.setAttribute('aria-expanded', 'true');
 
       if (typeof config.onOpen === 'function') {
-        config.onOpen();
+        safeInvokeCallback('onOpen', config.onOpen);
       }
     }
 
@@ -768,7 +785,7 @@
       state.input.removeAttribute('aria-activedescendant');
 
       if (typeof config.onClose === 'function') {
-        config.onClose();
+        safeInvokeCallback('onClose', config.onClose);
       }
     }
 
@@ -789,7 +806,7 @@
       }
 
       if (state.resultsContainer) {
-        state.resultsContainer.innerHTML = '';
+        setResultsHtml('');
       }
     }
 
@@ -822,7 +839,7 @@
     }
 
     // Public instance API
-    var instance = {
+    const instance = {
       init: init,
       destroy: destroy,
       rebuild: rebuild,
@@ -840,12 +857,12 @@
   /**
    * Search Component (singleton for backward compatibility)
    */
-  var Search = {
+  const Search = {
     // Factory method — creates and auto-initializes a new independent instance.
     // Always returns the instance so callers retain a reference even if the
     // DOM container is not yet available (they can retry init() later).
     create: function(options) {
-      var instance = createSearch(options);
+      const instance = createSearch(options);
       if (instance) {
         instance.init();
       }

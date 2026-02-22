@@ -1,4 +1,4 @@
-/*! Vanduo v1.1.6 | Built: 2026-02-17T18:38:55.867Z | git:c40d96d | development */
+/*! Vanduo v1.2.0 | Built: 2026-02-22T21:30:31.940Z | git:64c88fd | development */
 *, :before, :after {
   box-sizing: border-box;
 }
@@ -60582,6 +60582,290 @@ input.vd-doc-search-input {
   .vd-parallax-disable-mobile .vd-parallax-layer, .vd-parallax-disable-mobile .vd-parallax-bg, .vd-parallax-disable-mobile .vd-parallax-image {
     will-change: auto;
     transform: none !important;
+  }
+}
+
+:root {
+  --draggable-bg: var(--color-white);
+  --draggable-border-color: var(--border-color);
+  --draggable-hover-bg: var(--bg-secondary);
+  --draggable-hover-border-color: var(--color-primary);
+  --draggable-dragging-bg: var(--bg-secondary);
+  --draggable-dragging-border-color: var(--color-primary);
+  --draggable-dragging-shadow: var(--shadow-lg);
+  --drop-zone-bg: var(--color-primary-alpha-5);
+  --drop-zone-border-color: var(--color-primary-alpha-30);
+  --drop-zone-hover-bg: var(--color-primary-alpha-10);
+  --drop-zone-hover-border-color: var(--color-primary);
+  --drop-zone-active-bg: var(--color-primary-alpha-15);
+  --drop-zone-active-border-color: var(--color-primary);
+  --draggable-padding: .8125rem;
+  --draggable-margin: .5rem;
+  --drop-zone-padding: 1.3125rem;
+  --draggable-transition: all var(--transition-duration-base) var(--transition-ease);
+}
+
+[data-theme="dark"] {
+  --draggable-bg: var(--bg-secondary);
+  --draggable-hover-bg: var(--bg-primary);
+  --draggable-dragging-bg: var(--bg-primary);
+  --drop-zone-bg: var(--color-primary-alpha-10);
+  --drop-zone-border-color: var(--color-primary-alpha-40);
+  --drop-zone-hover-bg: var(--color-primary-alpha-15);
+  --drop-zone-active-bg: var(--color-primary-alpha-20);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --draggable-bg: var(--bg-secondary);
+    --draggable-hover-bg: var(--bg-primary);
+    --draggable-dragging-bg: var(--bg-primary);
+    --drop-zone-bg: var(--color-primary-alpha-10);
+    --drop-zone-border-color: var(--color-primary-alpha-40);
+    --drop-zone-hover-bg: var(--color-primary-alpha-15);
+    --drop-zone-active-bg: var(--color-primary-alpha-20);
+  }
+}
+
+.vd-draggable {
+  padding: var(--draggable-padding);
+  margin: var(--draggable-margin);
+  background-color: var(--draggable-bg);
+  border: 1px solid var(--draggable-border-color);
+  border-radius: var(--btn-border-radius);
+  cursor: grab;
+  user-select: none;
+  transition: var(--draggable-transition);
+  touch-action: none;
+  display: inline-block;
+  position: relative;
+}
+
+.vd-draggable:hover {
+  background-color: var(--draggable-hover-bg);
+  border-color: var(--draggable-hover-border-color);
+}
+
+.vd-draggable:active {
+  cursor: grabbing;
+}
+
+.vd-draggable[draggable="true"] {
+  cursor: grab;
+}
+
+.vd-draggable[draggable="true"]:active {
+  cursor: grabbing;
+}
+
+.vd-draggable.is-dragging {
+  opacity: .7;
+  background-color: var(--draggable-dragging-bg);
+  border-color: var(--draggable-dragging-border-color);
+  box-shadow: var(--draggable-dragging-shadow);
+  cursor: grabbing;
+  z-index: 1000;
+  transform: scale(1.02);
+}
+
+.vd-draggable-handle {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--text-muted);
+  cursor: grab;
+  transition: var(--draggable-transition);
+  justify-content: center;
+  align-items: center;
+  margin-right: .5rem;
+  display: inline-flex;
+}
+
+.vd-draggable-handle:hover {
+  color: var(--text-primary);
+}
+
+.vd-draggable:active .vd-draggable-handle {
+  cursor: grabbing;
+}
+
+.vd-drop-zone {
+  min-height: 3rem;
+  padding: var(--drop-zone-padding);
+  margin: var(--draggable-margin);
+  background-color: var(--drop-zone-bg);
+  border: 2px dashed var(--drop-zone-border-color);
+  border-radius: var(--btn-border-radius);
+  transition: var(--draggable-transition);
+  position: relative;
+}
+
+.vd-drop-zone:hover {
+  background-color: var(--drop-zone-hover-bg);
+  border-color: var(--drop-zone-hover-border-color);
+}
+
+.vd-drop-zone.is-drag-over {
+  background-color: var(--drop-zone-active-bg);
+  border-color: var(--drop-zone-active-border-color);
+  border-style: solid;
+  transform: scale(1.01);
+}
+
+.vd-drop-zone:empty:after {
+  content: "Drag items here";
+  text-align: center;
+  color: var(--text-muted);
+  padding: 1rem;
+  font-style: italic;
+  display: block;
+}
+
+.vd-drop-zone.is-drag-over:before {
+  content: "Drop here";
+  font-weight: var(--font-weight-medium);
+  color: var(--color-primary);
+  pointer-events: none;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.vd-draggable-container {
+  gap: var(--draggable-margin);
+  padding: var(--draggable-padding);
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--btn-border-radius);
+  flex-wrap: wrap;
+  display: flex;
+}
+
+.vd-draggable-container.vd-draggable-container-vertical {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.vd-draggable-item {
+  min-width: 8rem;
+  padding: var(--draggable-padding);
+  background-color: var(--draggable-bg);
+  border: 1px solid var(--draggable-border-color);
+  border-radius: var(--btn-border-radius);
+  cursor: grab;
+  transition: var(--draggable-transition);
+  flex: none;
+}
+
+.vd-draggable-item:hover {
+  background-color: var(--draggable-hover-bg);
+  border-color: var(--draggable-hover-border-color);
+}
+
+.vd-draggable-item.is-dragging {
+  opacity: .7;
+  background-color: var(--draggable-dragging-bg);
+  border-color: var(--draggable-dragging-border-color);
+  box-shadow: var(--draggable-dragging-shadow);
+  cursor: grabbing;
+  z-index: 1000;
+  transform: scale(1.02);
+}
+
+.vd-draggable-item:active {
+  cursor: grabbing;
+}
+
+.vd-draggable[aria-grabbed="true"], .vd-draggable-item[aria-grabbed="true"] {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  background-color: var(--draggable-dragging-bg);
+  border-color: var(--draggable-dragging-border-color);
+}
+
+.vd-drag-feedback {
+  pointer-events: none;
+  z-index: 9999;
+  opacity: .9;
+  transition: opacity .2s;
+  position: fixed;
+  transform: scale(.8);
+}
+
+.vd-drag-feedback.hidden {
+  opacity: 0;
+}
+
+.vd-draggable.is-disabled, .vd-draggable[disabled], .vd-draggable-item.is-disabled, .vd-draggable-item[disabled] {
+  opacity: .6;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+@media (width <= 575.98px) {
+  .vd-draggable-container {
+    padding: .5rem;
+  }
+
+  .vd-draggable-item {
+    min-width: 100%;
+  }
+
+  .vd-draggable {
+    margin: .5rem 0;
+    display: block;
+  }
+
+  .vd-drop-zone {
+    min-height: 2.5rem;
+    padding: 1rem;
+  }
+}
+
+.vd-draggable:focus-visible, .vd-draggable-item:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+@keyframes vd-drag-drop {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.05);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+.vd-draggable.is-dropped, .vd-draggable-item.is-dropped {
+  animation: .3s vd-drag-drop;
+}
+
+@media (forced-colors: active) {
+  .vd-draggable, .vd-draggable-item {
+    border: 2px solid buttontext;
+  }
+
+  .vd-draggable.is-dragging, .vd-draggable-item.is-dragging {
+    border-color: highlight;
+    outline: 2px solid highlight;
+  }
+
+  .vd-drop-zone {
+    border: 2px dashed buttontext;
+  }
+
+  .vd-drop-zone.is-drag-over {
+    border-style: solid;
+    border-color: highlight;
+  }
+
+  .vd-draggable:focus-visible, .vd-draggable-item:focus-visible {
+    outline: 2px solid highlight;
   }
 }
 

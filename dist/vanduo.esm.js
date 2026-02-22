@@ -1,4 +1,4 @@
-/*! Vanduo v1.1.6 | Built: 2026-02-17T18:38:55.867Z | git:c40d96d | development */
+/*! Vanduo v1.2.0 | Built: 2026-02-22T21:30:31.940Z | git:64c88fd | development */
 
 // js/utils/lifecycle.js
 (function() {
@@ -108,7 +108,7 @@
 (function() {
   "use strict";
   const Vanduo2 = {
-    version: "1.1.6",
+    version: "1.2.0",
     components: {},
     /**
      * Initialize framework
@@ -143,7 +143,7 @@
           }
         }
       });
-      console.log("Vanduo Framework v1.1.6 initialized");
+      console.log("Vanduo Framework v1.2.0 initialized");
     },
     /**
      * Register a component
@@ -158,7 +158,7 @@
      * @param {string} name - Component name
      */
     reinit: function(name) {
-      var component = this.components[name];
+      const component = this.components[name];
       if (component && component.init && typeof component.init === "function") {
         try {
           component.init();
@@ -172,9 +172,9 @@
      * Uses lifecycle manager for memory leak prevention
      */
     destroyAll: function() {
-      var names = Object.keys(this.components);
-      for (var i = 0; i < names.length; i++) {
-        var component = this.components[names[i]];
+      const names = Object.keys(this.components);
+      for (let i = 0; i < names.length; i++) {
+        const component = this.components[names[i]];
         if (component && component.destroyAll && typeof component.destroyAll === "function") {
           try {
             component.destroyAll();
@@ -491,7 +491,9 @@
       html = this.formatHtml(html);
       html = this.escapeHtml(html);
       html = this.highlightHtml(html);
-      pane.innerHTML = "<code>" + html + "</code>";
+      const codeEl = document.createElement("code");
+      codeEl.innerHTML = html;
+      pane.replaceChildren(codeEl);
       pane.dataset.extracted = "true";
     },
     /**
@@ -596,7 +598,7 @@
       }
       const codeWrapper = document.createElement("div");
       codeWrapper.className = "vd-code-snippet-code";
-      codeWrapper.innerHTML = code.outerHTML;
+      codeWrapper.appendChild(code.cloneNode(true));
       code.parentNode.removeChild(code);
       pane.appendChild(lineNumbers);
       pane.appendChild(codeWrapper);
@@ -1362,20 +1364,20 @@
 // js/components/grid.js
 (function() {
   "use strict";
-  var supportsHas = (function() {
+  const supportsHas = (function() {
     try {
       return CSS.supports("selector(:has(*))");
     } catch (_e) {
       return false;
     }
   })();
-  var GridLayout = {
+  const GridLayout = {
     instances: /* @__PURE__ */ new Map(),
     /**
      * Initialize all grid layout containers
      */
     init: function() {
-      var containers = document.querySelectorAll("[data-layout-mode]");
+      const containers = document.querySelectorAll("[data-layout-mode]");
       containers.forEach(function(container) {
         if (this.instances.has(container)) {
           return;
@@ -1389,8 +1391,8 @@
      * @param {HTMLElement} container - Element with data-layout-mode
      */
     initContainer: function(container) {
-      var mode = container.getAttribute("data-layout-mode") || "standard";
-      var cleanupFunctions = [];
+      const mode = container.getAttribute("data-layout-mode") || "standard";
+      const cleanupFunctions = [];
       this.applyMode(container, mode);
       container.setAttribute("role", "region");
       container.setAttribute("aria-label", "Grid layout: " + mode + " mode");
@@ -1403,15 +1405,15 @@
      * Initialize toggle buttons that target grid containers
      */
     initToggleButtons: function() {
-      var toggleButtons = document.querySelectorAll("[data-grid-toggle]");
+      const toggleButtons = document.querySelectorAll("[data-grid-toggle]");
       toggleButtons.forEach(function(button) {
         if (button.getAttribute("data-grid-initialized") === "true") {
           return;
         }
-        var clickHandler = function(e) {
+        const clickHandler = function(e) {
           e.preventDefault();
-          var targetSelector = button.getAttribute("data-grid-toggle");
-          var target;
+          const targetSelector = button.getAttribute("data-grid-toggle");
+          let target;
           if (targetSelector) {
             target = document.querySelector(targetSelector);
           } else {
@@ -1437,10 +1439,10 @@
      */
     applyFibFallback: function(container) {
       if (supportsHas) return;
-      var rows = container.querySelectorAll(".vd-row, .row");
+      const rows = container.querySelectorAll(".vd-row, .row");
       rows.forEach(function(row) {
-        var cols = row.querySelectorAll(':scope > [class*="vd-col-"], :scope > [class*="col-"]');
-        var count = cols.length;
+        const cols = row.querySelectorAll(':scope > [class*="vd-col-"], :scope > [class*="col-"]');
+        const count = cols.length;
         if (count === 1) {
           row.style.gridTemplateColumns = "1fr";
         } else if (count === 2) {
@@ -1459,7 +1461,7 @@
      * @param {HTMLElement} container - Grid container
      */
     removeFibFallback: function(container) {
-      var rows = container.querySelectorAll(".vd-row, .row");
+      const rows = container.querySelectorAll(".vd-row, .row");
       rows.forEach(function(row) {
         row.style.gridTemplateColumns = "";
       });
@@ -1480,11 +1482,11 @@
       }
       container.setAttribute("data-layout-mode", mode);
       container.setAttribute("aria-label", "Grid layout: " + mode + " mode");
-      var toggleButtons = document.querySelectorAll("[data-grid-toggle]");
+      const toggleButtons = document.querySelectorAll("[data-grid-toggle]");
       toggleButtons.forEach(function(btn) {
-        var targetSelector = btn.getAttribute("data-grid-toggle");
+        const targetSelector = btn.getAttribute("data-grid-toggle");
         if (targetSelector && container.matches(targetSelector)) {
-          var isActive = mode === "fibonacci";
+          const isActive = mode === "fibonacci";
           if (isActive) {
             btn.classList.add("is-active");
           } else {
@@ -1493,11 +1495,11 @@
           btn.setAttribute("aria-pressed", isActive ? "true" : "false");
         }
       });
-      var instance = this.instances.get(container);
+      const instance = this.instances.get(container);
       if (instance) {
         instance.mode = mode;
       }
-      var event;
+      let event;
       try {
         event = new CustomEvent("grid:modechange", {
           bubbles: true,
@@ -1524,8 +1526,8 @@
         container = document.querySelector(container);
       }
       if (!container) return;
-      var currentMode = container.getAttribute("data-layout-mode") || "standard";
-      var newMode = currentMode === "fibonacci" ? "standard" : "fibonacci";
+      const currentMode = container.getAttribute("data-layout-mode") || "standard";
+      const newMode = currentMode === "fibonacci" ? "standard" : "fibonacci";
       this.applyMode(container, newMode);
     },
     /**
@@ -1558,7 +1560,7 @@
      * @param {HTMLElement} container - Grid container
      */
     destroy: function(container) {
-      var instance = this.instances.get(container);
+      const instance = this.instances.get(container);
       if (!instance) return;
       instance.cleanup.forEach(function(fn) {
         fn();
@@ -1575,7 +1577,7 @@
       this.instances.forEach(function(instance, container) {
         this.destroy(container);
       }.bind(this));
-      var toggleButtons = document.querySelectorAll('[data-grid-initialized="true"]');
+      const toggleButtons = document.querySelectorAll('[data-grid-initialized="true"]');
       toggleButtons.forEach(function(button) {
         if (button._gridCleanup) {
           button._gridCleanup();
@@ -3672,9 +3674,9 @@
     },
     // Default values
     DEFAULTS: {
-      PRIMARY_LIGHT: "amber",
+      PRIMARY_LIGHT: "black",
       PRIMARY_DARK: "amber",
-      NEUTRAL: "slate",
+      NEUTRAL: "neutral",
       RADIUS: "0.5",
       FONT: "ubuntu",
       THEME: "system"
@@ -4037,21 +4039,33 @@
      * Generate panel HTML
      */
     getPanelHTML: function() {
+      const esc = typeof escapeHtml === "function" ? escapeHtml : function(text) {
+        const div = document.createElement("div");
+        div.textContent = String(text ?? "");
+        return div.innerHTML;
+      };
+      const safeColor = function(value) {
+        const normalized = String(value ?? "").trim();
+        if (/^(#[0-9a-fA-F]{3,8}|rgb[a]?\([^)]{1,60}\)|hsl[a]?\([^)]{1,60}\)|var\(--[a-zA-Z0-9_-]{1,40}\))$/.test(normalized)) {
+          return normalized;
+        }
+        return "#000000";
+      };
       let primarySwatches = "";
       for (const [key, value] of Object.entries(this.PRIMARY_COLORS)) {
-        primarySwatches += `<button class="tc-color-swatch${key === this.state.primary ? " is-active" : ""}" data-color="${key}" style="--swatch-color: ${value.color}" title="${value.name}"></button>`;
+        primarySwatches += `<button class="tc-color-swatch${key === this.state.primary ? " is-active" : ""}" data-color="${esc(key)}" style="--swatch-color: ${safeColor(value.color)}" title="${esc(value.name)}"></button>`;
       }
       let neutralSwatches = "";
       for (const [key, value] of Object.entries(this.NEUTRAL_COLORS)) {
-        neutralSwatches += `<button class="tc-neutral-swatch${key === this.state.neutral ? " is-active" : ""}" data-neutral="${key}" style="--swatch-color: ${value.color}" title="${value.name}"><span>${value.name}</span></button>`;
+        neutralSwatches += `<button class="tc-neutral-swatch${key === this.state.neutral ? " is-active" : ""}" data-neutral="${esc(key)}" style="--swatch-color: ${safeColor(value.color)}" title="${esc(value.name)}"><span>${esc(value.name)}</span></button>`;
       }
       let radiusButtons = "";
       this.RADIUS_OPTIONS.forEach((r) => {
-        radiusButtons += `<button class="tc-radius-btn${r === this.state.radius ? " is-active" : ""}" data-radius="${r}">${r}</button>`;
+        radiusButtons += `<button class="tc-radius-btn${r === this.state.radius ? " is-active" : ""}" data-radius="${esc(r)}">${esc(r)}</button>`;
       });
       let fontOptions = "";
       for (const [key, value] of Object.entries(this.FONT_OPTIONS)) {
-        fontOptions += `<option value="${key}"${key === this.state.font ? " selected" : ""}>${value.name}</option>`;
+        fontOptions += `<option value="${esc(key)}"${key === this.state.font ? " selected" : ""}>${esc(value.name)}</option>`;
       }
       const modeIcons = {
         "system": "ph-desktop",
@@ -4109,6 +4123,13 @@
     /**
      * Bind event listeners
      */
+    /**
+     * Check whether the current primary color is one of the auto-defaults
+     * (i.e. the user hasn't explicitly picked a non-default color).
+     */
+    isUsingDefaultPrimary: function() {
+      return this.state.primary === this.DEFAULTS.PRIMARY_LIGHT || this.state.primary === this.DEFAULTS.PRIMARY_DARK;
+    },
     bindEvents: function() {
       if (this.elements.trigger) {
         this.addListener(this.elements.trigger, "click", (e) => {
@@ -4118,6 +4139,20 @@
         });
       }
       this.bindPanelEvents();
+      if (window.matchMedia) {
+        const mq = window.matchMedia("(prefers-color-scheme: dark)");
+        const handler = () => {
+          if (this.state.theme === "system" && this.isUsingDefaultPrimary()) {
+            const newDefault = this.getDefaultPrimary("system");
+            if (newDefault !== this.state.primary) {
+              this.applyPrimary(newDefault);
+              this.updateUI();
+            }
+          }
+        };
+        mq.addEventListener("change", handler);
+        this._cleanup.push(() => mq.removeEventListener("change", handler));
+      }
       this.addListener(document, "click", (e) => {
         if (this.state.isOpen && this.elements.customizer && !this.elements.customizer.contains(e.target)) {
           this.close();
@@ -4679,7 +4714,7 @@
       if (typeof sanitizeHtml === "function") {
         return sanitizeHtml(input);
       }
-      var div = document.createElement("div");
+      const div = document.createElement("div");
       div.textContent = input || "";
       return div.innerHTML;
     },
@@ -4918,7 +4953,7 @@
 // js/components/doc-search.js
 (function() {
   "use strict";
-  var DEFAULTS = {
+  const DEFAULTS = {
     // Behavior
     minQueryLength: 2,
     maxResults: 10,
@@ -4965,8 +5000,8 @@
     placeholder: "Search..."
   };
   function createSearch(options) {
-    var config = Object.assign({}, DEFAULTS, options || {});
-    var state = {
+    const config = Object.assign({}, DEFAULTS, options || {});
+    const state = {
       initialized: false,
       index: [],
       results: [],
@@ -4979,6 +5014,21 @@
       debounceTimer: null,
       boundHandlers: {}
     };
+    function safeInvokeCallback(name, fn, ...args) {
+      try {
+        fn(...args);
+      } catch (error) {
+        console.warn('[Vanduo Search] Callback error in "' + name + '":', error);
+      }
+    }
+    function setResultsHtml(html) {
+      if (!state.resultsContainer) return;
+      try {
+        state.resultsContainer.innerHTML = html;
+      } catch (error) {
+        console.warn("[Vanduo Search] Failed to render results:", error);
+      }
+    }
     function init() {
       if (state.initialized) {
         return instance;
@@ -5020,20 +5070,20 @@
         });
         return;
       }
-      var sections = document.querySelectorAll(config.contentSelector);
-      var categoryMap = buildCategoryMap();
+      const sections = document.querySelectorAll(config.contentSelector);
+      const categoryMap = buildCategoryMap();
       sections.forEach(function(section) {
-        var id = section.id;
+        const id = section.id;
         if (!id) return;
-        var titleEl = section.querySelector(config.titleSelector);
-        var title = titleEl ? titleEl.textContent.replace(/v[\d.]+/g, "").trim() : id;
-        var category = categoryMap[id] || "Documentation";
-        var content = extractContent(section);
-        var keywords = extractKeywords(section, title);
-        var iconEl = titleEl ? titleEl.querySelector("i.ph") : null;
-        var icon = "";
+        const titleEl = section.querySelector(config.titleSelector);
+        const title = titleEl ? titleEl.textContent.replace(/v[\d.]+/g, "").trim() : id;
+        const category = categoryMap[id] || "Documentation";
+        const content = extractContent(section);
+        const keywords = extractKeywords(section, title);
+        const iconEl = titleEl ? titleEl.querySelector("i.ph") : null;
+        let icon = "";
         if (iconEl && iconEl.classList) {
-          for (var ci = 0; ci < iconEl.classList.length; ci++) {
+          for (let ci = 0; ci < iconEl.classList.length; ci++) {
             if (iconEl.classList[ci].indexOf("ph-") === 0) {
               icon = iconEl.classList[ci];
               break;
@@ -5053,16 +5103,16 @@
       });
     }
     function buildCategoryMap() {
-      var map = {};
-      var currentCategory = "Documentation";
-      var navItems = document.querySelectorAll(config.navSelector + ", " + config.sectionSelector);
+      const map = {};
+      let currentCategory = "Documentation";
+      const navItems = document.querySelectorAll(config.navSelector + ", " + config.sectionSelector);
       navItems.forEach(function(item) {
         if (item.classList.contains("doc-nav-section")) {
           currentCategory = item.textContent.trim();
         } else {
-          var href = item.getAttribute("href");
+          const href = item.getAttribute("href");
           if (href && href.startsWith("#")) {
-            var id = href.substring(1);
+            const id = href.substring(1);
             map[id] = currentCategory;
           }
         }
@@ -5070,35 +5120,35 @@
       return map;
     }
     function extractContent(section) {
-      var clone = section.cloneNode(true);
-      var toRemove = clone.querySelectorAll(config.excludeFromContent);
+      const clone = section.cloneNode(true);
+      const toRemove = clone.querySelectorAll(config.excludeFromContent);
       toRemove.forEach(function(el) {
         el.remove();
       });
-      var text = clone.textContent || "";
+      let text = clone.textContent || "";
       text = text.replace(/\s+/g, " ").trim();
       return text.substring(0, config.maxContentLength);
     }
     function extractKeywords(section, title) {
-      var keywords = [];
+      const keywords = [];
       title.toLowerCase().split(/\s+/).forEach(function(word) {
         if (word.length > 2) {
           keywords.push(word);
         }
       });
-      var codeBlocks = section.querySelectorAll("code");
+      const codeBlocks = section.querySelectorAll("code");
       codeBlocks.forEach(function(code) {
-        var text = code.textContent || "";
-        var classMatches = text.match(/\.([\w-]+)/g);
+        const text = code.textContent || "";
+        const classMatches = text.match(/\.([\w-]+)/g);
         if (classMatches) {
           classMatches.forEach(function(match) {
             keywords.push(match.substring(1).toLowerCase());
           });
         }
       });
-      var dataAttrs = section.querySelectorAll("[data-tooltip], [data-modal]");
+      const dataAttrs = section.querySelectorAll("[data-tooltip], [data-modal]");
       dataAttrs.forEach(function(el) {
-        var attrs = el.getAttributeNames().filter(function(name) {
+        const attrs = el.getAttributeNames().filter(function(name) {
           return name.startsWith("data-");
         });
         attrs.forEach(function(attr) {
@@ -5108,7 +5158,7 @@
       return Array.from(new Set(keywords));
     }
     function extractKeywordsFromText(text) {
-      var words = text.toLowerCase().split(/\s+/);
+      const words = text.toLowerCase().split(/\s+/);
       return words.filter(function(word) {
         return word.length > 2;
       });
@@ -5141,9 +5191,9 @@
         }
       };
       state.boundHandlers.handleResultClick = function(e) {
-        var result = e.target.closest(".vd-doc-search-result");
+        const result = e.target.closest(".vd-doc-search-result");
         if (result) {
-          var index = parseInt(result.dataset.index, 10);
+          const index = parseInt(result.dataset.index, 10);
           select(index);
         }
       };
@@ -5167,7 +5217,7 @@
       }
     }
     function setupAria() {
-      var resultsId = state.resultsContainer.id || "search-results-" + Math.random().toString(36).substr(2, 9);
+      const resultsId = state.resultsContainer.id || "search-results-" + Math.random().toString(36).substr(2, 9);
       state.resultsContainer.id = resultsId;
       state.input.setAttribute("role", "combobox");
       state.input.setAttribute("aria-autocomplete", "list");
@@ -5177,7 +5227,7 @@
       state.resultsContainer.setAttribute("aria-label", "Search results");
     }
     function handleInput(e) {
-      var query = e.target.value.trim();
+      const query = e.target.value.trim();
       if (state.debounceTimer) {
         clearTimeout(state.debounceTimer);
       }
@@ -5192,7 +5242,7 @@
         render();
         open();
         if (typeof config.onSearch === "function") {
-          config.onSearch(query, state.results);
+          safeInvokeCallback("onSearch", config.onSearch, query, state.results);
         }
       }, config.debounceMs);
     }
@@ -5233,15 +5283,15 @@
       }
     }
     function search(query) {
-      var terms = query.toLowerCase().split(/\s+/).filter(function(t) {
+      const terms = query.toLowerCase().split(/\s+/).filter(function(t) {
         return t.length > 0;
       });
-      var scored = [];
+      const scored = [];
       state.index.forEach(function(entry) {
-        var score = 0;
-        var titleLower = entry.title.toLowerCase();
-        var categoryLower = entry.category.toLowerCase();
-        var contentLower = entry.content.toLowerCase();
+        let score = 0;
+        const titleLower = entry.title.toLowerCase();
+        const categoryLower = entry.category.toLowerCase();
+        const contentLower = entry.content.toLowerCase();
         terms.forEach(function(term) {
           if (titleLower.includes(term)) {
             score += 100;
@@ -5254,7 +5304,7 @@
           if (categoryLower.includes(term)) {
             score += 50;
           }
-          var keywordMatch = entry.keywords.some(function(k) {
+          const keywordMatch = entry.keywords.some(function(k) {
             return k.includes(term);
           });
           if (keywordMatch) {
@@ -5284,19 +5334,19 @@
     }
     function render() {
       if (state.results.length === 0) {
-        state.resultsContainer.innerHTML = renderEmpty();
+        setResultsHtml(renderEmpty());
         return;
       }
-      var html = '<ul class="vd-doc-search-results-list" role="listbox">';
+      let html = '<ul class="vd-doc-search-results-list" role="listbox">';
       state.results.forEach(function(result, index) {
-        var isActive = index === state.activeIndex;
-        var icon = result.icon || getCategoryIcon(result.categorySlug);
-        var excerpt = getExcerpt(result.content, state.query);
+        const isActive = index === state.activeIndex;
+        const icon = result.icon || getCategoryIcon(result.categorySlug);
+        const excerpt = getExcerpt(result.content, state.query);
         html += '<li class="vd-doc-search-result' + (isActive ? " is-active" : "") + '" role="option" id="vd-doc-search-result-' + index + '" data-index="' + index + '" data-category="' + escapeHtml2(result.categorySlug) + '" aria-selected="' + isActive + '"><div class="vd-doc-search-result-icon"><i class="ph ' + escapeHtml2(icon) + '"></i></div><div class="vd-doc-search-result-content"><div class="vd-doc-search-result-title">' + highlight(result.title, state.query) + '</div><div class="vd-doc-search-result-category">' + escapeHtml2(result.category) + '</div><div class="vd-doc-search-result-excerpt">' + highlight(excerpt, state.query) + "</div></div></li>";
       });
       html += "</ul>";
       html += renderFooter();
-      state.resultsContainer.innerHTML = html;
+      setResultsHtml(html);
     }
     function renderEmpty() {
       return '<div class="vd-doc-search-empty"><div class="vd-doc-search-empty-icon"><i class="ph ph-magnifying-glass"></i></div><div class="vd-doc-search-empty-title">' + escapeHtml2(config.emptyTitle) + '</div><div class="vd-doc-search-empty-text">' + escapeHtml2(config.emptyText) + "</div></div>";
@@ -5308,12 +5358,12 @@
       return config.categoryIcons[categorySlug] || config.categoryIcons["default"] || "ph-file-text";
     }
     function getExcerpt(content, query) {
-      var terms = query.toLowerCase().split(/\s+/);
-      var contentLower = content.toLowerCase();
-      var excerptLength = 100;
-      var matchPos = -1;
-      for (var i = 0; i < terms.length; i++) {
-        var pos = contentLower.indexOf(terms[i]);
+      const terms = query.toLowerCase().split(/\s+/);
+      const contentLower = content.toLowerCase();
+      const excerptLength = 100;
+      let matchPos = -1;
+      for (let i = 0; i < terms.length; i++) {
+        const pos = contentLower.indexOf(terms[i]);
         if (pos !== -1 && (matchPos === -1 || pos < matchPos)) {
           matchPos = pos;
         }
@@ -5321,9 +5371,9 @@
       if (matchPos === -1) {
         return content.substring(0, excerptLength) + "...";
       }
-      var start = Math.max(0, matchPos - 30);
-      var end = Math.min(content.length, matchPos + excerptLength);
-      var excerpt = content.substring(start, end);
+      const start = Math.max(0, matchPos - 30);
+      const end = Math.min(content.length, matchPos + excerptLength);
+      let excerpt = content.substring(start, end);
       if (start > 0) {
         excerpt = "..." + excerpt;
       }
@@ -5334,24 +5384,24 @@
     }
     function highlight(text, query) {
       if (!query) return escapeHtml2(text);
-      var terms = query.toLowerCase().split(/\s+/).filter(function(t) {
+      const terms = query.toLowerCase().split(/\s+/).filter(function(t) {
         return t.length > 0;
       });
-      var escaped = escapeHtml2(text);
+      let escaped = escapeHtml2(text);
       terms.forEach(function(term) {
         if (term.length > 50) return;
-        var regex = new RegExp("(" + term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + ")", "gi");
+        const regex = new RegExp("(" + term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + ")", "gi");
         escaped = escaped.replace(regex, "<" + config.highlightTag + ">$1</" + config.highlightTag + ">");
       });
       return escaped;
     }
     function escapeHtml2(text) {
-      var div = document.createElement("div");
+      const div = document.createElement("div");
       div.textContent = text;
       return div.innerHTML;
     }
     function navigate(direction) {
-      var newIndex = state.activeIndex + direction;
+      let newIndex = state.activeIndex + direction;
       if (newIndex < 0) {
         newIndex = state.results.length - 1;
       } else if (newIndex >= state.results.length) {
@@ -5360,13 +5410,13 @@
       setActiveIndex(newIndex);
     }
     function setActiveIndex(index) {
-      var prevActive = state.resultsContainer.querySelector(".vd-doc-search-result.is-active");
+      const prevActive = state.resultsContainer.querySelector(".vd-doc-search-result.is-active");
       if (prevActive) {
         prevActive.classList.remove("is-active");
         prevActive.setAttribute("aria-selected", "false");
       }
       state.activeIndex = index;
-      var newActive = state.resultsContainer.querySelector('[data-index="' + index + '"]');
+      const newActive = state.resultsContainer.querySelector('[data-index="' + index + '"]');
       if (newActive) {
         newActive.classList.add("is-active");
         newActive.setAttribute("aria-selected", "true");
@@ -5375,16 +5425,16 @@
       }
     }
     function select(index) {
-      var result = state.results[index];
+      const result = state.results[index];
       if (!result) return;
       close();
       state.input.value = "";
       state.query = "";
       if (typeof config.onSelect === "function") {
-        config.onSelect(result);
+        safeInvokeCallback("onSelect", config.onSelect, result);
         return;
       }
-      var section = document.querySelector(result.url);
+      const section = document.querySelector(result.url);
       if (section) {
         section.scrollIntoView({ behavior: "smooth", block: "start" });
         window.history.pushState(null, "", result.url);
@@ -5392,7 +5442,7 @@
       }
     }
     function updateSidebarActive(sectionId) {
-      var navLinks = document.querySelectorAll(config.navSelector);
+      const navLinks = document.querySelectorAll(config.navSelector);
       navLinks.forEach(function(link) {
         link.classList.remove("active");
         if (link.getAttribute("href") === "#" + sectionId) {
@@ -5406,7 +5456,7 @@
       state.resultsContainer.classList.add("is-open");
       state.input.setAttribute("aria-expanded", "true");
       if (typeof config.onOpen === "function") {
-        config.onOpen();
+        safeInvokeCallback("onOpen", config.onOpen);
       }
     }
     function close() {
@@ -5417,7 +5467,7 @@
       state.input.setAttribute("aria-expanded", "false");
       state.input.removeAttribute("aria-activedescendant");
       if (typeof config.onClose === "function") {
-        config.onClose();
+        safeInvokeCallback("onClose", config.onClose);
       }
     }
     function destroy() {
@@ -5431,7 +5481,7 @@
         clearTimeout(state.debounceTimer);
       }
       if (state.resultsContainer) {
-        state.resultsContainer.innerHTML = "";
+        setResultsHtml("");
       }
     }
     function rebuild() {
@@ -5446,7 +5496,7 @@
     function getIndex() {
       return state.index.slice();
     }
-    var instance = {
+    const instance = {
       init,
       destroy,
       rebuild,
@@ -5459,12 +5509,12 @@
     };
     return instance;
   }
-  var Search = {
+  const Search = {
     // Factory method — creates and auto-initializes a new independent instance.
     // Always returns the instance so callers retain a reference even if the
     // DOM container is not yet available (they can retry init() later).
     create: function(options) {
-      var instance = createSearch(options);
+      const instance = createSearch(options);
       if (instance) {
         instance.init();
       }
@@ -5536,6 +5586,565 @@
   window.Search = Search;
   window.DocSearch = Search;
   window.VanduoDocSearch = Search;
+})();
+
+// js/components/draggable.js
+(function() {
+  "use strict";
+  const Draggable = {
+    // Store initialized draggables and their cleanup functions
+    instances: /* @__PURE__ */ new Map(),
+    // Store current drag state
+    currentDrag: null,
+    // Store touch state
+    touchState: null,
+    // Feedback element
+    feedbackElement: null,
+    /**
+     * Initialize draggable components
+     */
+    init: function() {
+      const draggables = document.querySelectorAll(".vd-draggable, [data-draggable]");
+      draggables.forEach((element) => {
+        if (this.instances.has(element)) {
+          return;
+        }
+        this.initDraggable(element);
+      });
+      const containers = document.querySelectorAll(".vd-draggable-container, .vd-draggable-container-vertical");
+      containers.forEach((container) => {
+        if (!this.instances.has(container)) {
+          this.initContainer(container);
+        }
+      });
+      const dropZones = document.querySelectorAll(".vd-drop-zone");
+      dropZones.forEach((zone) => {
+        if (!this.instances.has(zone)) {
+          this.initDropZone(zone);
+        }
+      });
+      this.createFeedbackElement();
+    },
+    /**
+     * Initialize a single draggable element
+     * @param {HTMLElement} element - Draggable element
+     */
+    initDraggable: function(element) {
+      const cleanupFunctions = [];
+      if (!element.hasAttribute("draggable")) {
+        element.setAttribute("draggable", "true");
+      }
+      if (!element.hasAttribute("tabindex")) {
+        element.setAttribute("tabindex", "0");
+      }
+      element.setAttribute("role", "option");
+      element.setAttribute("aria-roledescription", "draggable item");
+      element.setAttribute("aria-grabbed", "false");
+      const dragStartHandler = (e) => {
+        this.handleDragStart(e, element);
+      };
+      element.addEventListener("dragstart", dragStartHandler);
+      cleanupFunctions.push(() => element.removeEventListener("dragstart", dragStartHandler));
+      const dragHandler = (e) => {
+        this.handleDrag(e, element);
+      };
+      element.addEventListener("drag", dragHandler);
+      cleanupFunctions.push(() => element.removeEventListener("drag", dragHandler));
+      const dragEndHandler = (e) => {
+        this.handleDragEnd(e, element);
+      };
+      element.addEventListener("dragend", dragEndHandler);
+      cleanupFunctions.push(() => element.removeEventListener("dragend", dragEndHandler));
+      const touchStartHandler = (e) => {
+        this.handleTouchStart(e, element);
+      };
+      element.addEventListener("touchstart", touchStartHandler);
+      cleanupFunctions.push(() => element.removeEventListener("touchstart", touchStartHandler));
+      const touchMoveHandler = (e) => {
+        this.handleTouchMove(e, element);
+      };
+      element.addEventListener("touchmove", touchMoveHandler);
+      cleanupFunctions.push(() => element.removeEventListener("touchmove", touchMoveHandler));
+      const touchEndHandler = (e) => {
+        this.handleTouchEnd(e, element);
+      };
+      element.addEventListener("touchend", touchEndHandler);
+      cleanupFunctions.push(() => element.removeEventListener("touchend", touchEndHandler));
+      const touchCancelHandler = (e) => {
+        this.handleTouchEnd(e, element);
+      };
+      element.addEventListener("touchcancel", touchCancelHandler);
+      cleanupFunctions.push(() => element.removeEventListener("touchcancel", touchCancelHandler));
+      const keydownHandler = (e) => {
+        this.handleKeydown(e, element);
+      };
+      element.addEventListener("keydown", keydownHandler);
+      cleanupFunctions.push(() => element.removeEventListener("keydown", keydownHandler));
+      this.instances.set(element, { cleanup: cleanupFunctions });
+    },
+    /**
+     * Initialize a draggable container
+     * @param {HTMLElement} container - Draggable container
+     */
+    initContainer: function(container) {
+      container.setAttribute("role", "listbox");
+      container.setAttribute("aria-label", container.getAttribute("aria-label") || "Draggable items");
+      const items = container.querySelectorAll(".vd-draggable-item");
+      items.forEach((item) => {
+        if (!this.instances.has(item)) {
+          this.initDraggable(item);
+        }
+      });
+      const cleanupFunctions = [];
+      const dragEnterHandler = (e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = "move";
+      };
+      const dragOverHandler = (e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = "move";
+        if (!this.currentDrag) return;
+        const draggingEl = this.currentDrag.element;
+        if (!container.contains(draggingEl)) return;
+        if (e.clientX === 0 && e.clientY === 0) return;
+        this.handleReorder(container, draggingEl, e.clientX, e.clientY);
+      };
+      const dropHandler = (e) => {
+        e.preventDefault();
+      };
+      container.addEventListener("dragenter", dragEnterHandler);
+      container.addEventListener("dragover", dragOverHandler);
+      container.addEventListener("drop", dropHandler);
+      cleanupFunctions.push(() => {
+        container.removeEventListener("dragenter", dragEnterHandler);
+        container.removeEventListener("dragover", dragOverHandler);
+        container.removeEventListener("drop", dropHandler);
+      });
+      this.instances.set(container, { cleanup: cleanupFunctions });
+    },
+    /**
+     * Initialize a drop zone
+     * @param {HTMLElement} zone - Drop zone element
+     */
+    initDropZone: function(zone) {
+      const cleanupFunctions = [];
+      zone.setAttribute("role", "region");
+      zone.setAttribute("aria-dropeffect", "move");
+      if (!zone.hasAttribute("aria-label")) {
+        zone.setAttribute("aria-label", "Drop zone");
+      }
+      const dragOverHandler = (e) => {
+        e.preventDefault();
+        this.handleDragOver(e, zone);
+      };
+      zone.addEventListener("dragover", dragOverHandler);
+      cleanupFunctions.push(() => zone.removeEventListener("dragover", dragOverHandler));
+      const dragEnterHandler = (e) => {
+        e.preventDefault();
+        this.handleDragEnter(e, zone);
+      };
+      zone.addEventListener("dragenter", dragEnterHandler);
+      cleanupFunctions.push(() => zone.removeEventListener("dragenter", dragEnterHandler));
+      const dragLeaveHandler = (e) => {
+        this.handleDragLeave(e, zone);
+      };
+      zone.addEventListener("dragleave", dragLeaveHandler);
+      cleanupFunctions.push(() => zone.removeEventListener("dragleave", dragLeaveHandler));
+      const dropHandler = (e) => {
+        e.preventDefault();
+        this.handleDrop(e, zone);
+      };
+      zone.addEventListener("drop", dropHandler);
+      cleanupFunctions.push(() => zone.removeEventListener("drop", dropHandler));
+      this.instances.set(zone, { cleanup: cleanupFunctions });
+    },
+    /**
+     * Create feedback element for drag operations
+     */
+    createFeedbackElement: function() {
+      if (!this.feedbackElement) {
+        const existing = document.querySelector(".vd-drag-feedback");
+        if (existing) {
+          this.feedbackElement = existing;
+          return;
+        }
+        this.feedbackElement = document.createElement("div");
+        this.feedbackElement.className = "vd-drag-feedback hidden";
+        this.feedbackElement.setAttribute("role", "presentation");
+        document.body.appendChild(this.feedbackElement);
+      }
+    },
+    /**
+     * Handle drag start event
+     * @param {DragEvent} e - Drag event
+     * @param {HTMLElement} element - Draggable element
+     */
+    handleDragStart: function(e, element) {
+      element.classList.add("is-dragging");
+      element.setAttribute("aria-grabbed", "true");
+      this.currentDrag = {
+        element,
+        initialPosition: { x: e.clientX, y: e.clientY },
+        initialBounds: element.getBoundingClientRect(),
+        data: this.getData(element)
+      };
+      e.dataTransfer.effectAllowed = "move";
+      e.dataTransfer.setData("text/plain", this.currentDrag.data);
+      element.dispatchEvent(new CustomEvent("draggable:start", {
+        bubbles: true,
+        detail: {
+          element,
+          data: this.currentDrag.data,
+          position: { x: e.clientX, y: e.clientY }
+        }
+      }));
+    },
+    /**
+     * Handle drag event
+     * @param {DragEvent} e - Drag event
+     * @param {HTMLElement} element - Draggable element
+     */
+    handleDrag: function(e, element) {
+      if (!this.currentDrag) return;
+      element.dispatchEvent(new CustomEvent("draggable:drag", {
+        bubbles: true,
+        detail: {
+          element,
+          data: this.currentDrag.data,
+          position: { x: e.clientX, y: e.clientY },
+          delta: {
+            x: e.clientX - this.currentDrag.initialPosition.x,
+            y: e.clientY - this.currentDrag.initialPosition.y
+          }
+        }
+      }));
+    },
+    /**
+     * Handle drag end event
+     * @param {DragEvent} e - Drag event
+     * @param {HTMLElement} element - Draggable element
+     */
+    handleDragEnd: function(e, element) {
+      element.classList.remove("is-dragging");
+      element.classList.add("is-dropped");
+      setTimeout(() => element.classList.remove("is-dropped"), 300);
+      element.setAttribute("aria-grabbed", "false");
+      if (this.feedbackElement) {
+        this.feedbackElement.classList.add("hidden");
+      }
+      const data = this.currentDrag?.data || this.getData(element);
+      const initialPos = this.currentDrag?.initialPosition || { x: 0, y: 0 };
+      element.dispatchEvent(new CustomEvent("draggable:end", {
+        bubbles: true,
+        detail: {
+          element,
+          data,
+          position: { x: e.clientX, y: e.clientY },
+          delta: {
+            x: e.clientX - initialPos.x,
+            y: e.clientY - initialPos.y
+          }
+        }
+      }));
+      this.currentDrag = null;
+    },
+    /**
+     * Handle touch start event (for mobile)
+     * @param {TouchEvent} e - Touch event
+     * @param {HTMLElement} element - Draggable element
+     */
+    handleTouchStart: function(e, element) {
+      const touch = e.touches[0];
+      this.touchState = {
+        element,
+        startX: touch.clientX,
+        startY: touch.clientY,
+        startTime: Date.now(),
+        isDragging: false
+      };
+    },
+    /**
+     * Handle touch move event (for mobile)
+     * @param {TouchEvent} e - Touch event
+     * @param {HTMLElement} element - Draggable element
+     */
+    handleTouchMove: function(e, element) {
+      if (!this.touchState) return;
+      const touch = e.touches[0];
+      const deltaX = touch.clientX - this.touchState.startX;
+      const deltaY = touch.clientY - this.touchState.startY;
+      if (Math.abs(deltaX) > 10 || Math.abs(deltaY) > 10) {
+        e.preventDefault();
+        if (!this.touchState.isDragging) {
+          this.touchState.isDragging = true;
+          element.classList.add("is-dragging");
+          element.setAttribute("aria-grabbed", "true");
+          this.currentDrag = {
+            element,
+            initialPosition: { x: this.touchState.startX, y: this.touchState.startY },
+            initialBounds: element.getBoundingClientRect(),
+            data: this.getData(element)
+          };
+          element.dispatchEvent(new CustomEvent("draggable:start", {
+            bubbles: true,
+            detail: {
+              element,
+              data: this.currentDrag.data,
+              position: { x: touch.clientX, y: touch.clientY }
+            }
+          }));
+        }
+        this.updateFeedback(touch.clientX, touch.clientY);
+        if (this.currentDrag) {
+          element.dispatchEvent(new CustomEvent("draggable:drag", {
+            bubbles: true,
+            detail: {
+              element,
+              data: this.currentDrag.data,
+              position: { x: touch.clientX, y: touch.clientY },
+              delta: { x: deltaX, y: deltaY }
+            }
+          }));
+          const container = element.closest(".vd-draggable-container");
+          if (container && container.contains(element)) {
+            this.handleReorder(container, element, touch.clientX, touch.clientY);
+          }
+        }
+      }
+    },
+    /**
+     * Handle touch end event (for mobile)
+     * @param {TouchEvent} e - Touch event
+     * @param {HTMLElement} element - Draggable element
+     */
+    handleTouchEnd: function(e, element) {
+      if (this.touchState && this.touchState.isDragging) {
+        e.preventDefault();
+        element.classList.remove("is-dragging");
+        element.classList.add("is-dropped");
+        element.setAttribute("aria-grabbed", "false");
+        setTimeout(() => element.classList.remove("is-dropped"), 300);
+        if (this.feedbackElement) {
+          this.feedbackElement.classList.add("hidden");
+        }
+        const endTouch = e.changedTouches[0];
+        const data = this.currentDrag?.data || this.getData(element);
+        const startX = this.touchState?.startX || 0;
+        const startY = this.touchState?.startY || 0;
+        element.dispatchEvent(new CustomEvent("draggable:end", {
+          bubbles: true,
+          detail: {
+            element,
+            data,
+            position: { x: endTouch.clientX, y: endTouch.clientY },
+            delta: {
+              x: endTouch.clientX - startX,
+              y: endTouch.clientY - startY
+            }
+          }
+        }));
+      }
+      this.touchState = null;
+      this.currentDrag = null;
+    },
+    /**
+     * Handle drag over event
+     * @param {DragEvent} e - Drag event
+     * @param {HTMLElement} _zone - Drop zone element
+     */
+    handleDragOver: function(e, _zone) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = "move";
+    },
+    /**
+     * Handle drag enter event
+     * @param {DragEvent} e - Drag event
+     * @param {HTMLElement} zone - Drop zone element
+     */
+    handleDragEnter: function(e, zone) {
+      e.preventDefault();
+      zone.classList.add("is-drag-over");
+    },
+    /**
+     * Handle drag leave event
+     * @param {DragEvent} e - Drag event
+     * @param {HTMLElement} zone - Drop zone element
+     */
+    handleDragLeave: function(e, zone) {
+      zone.classList.remove("is-drag-over");
+    },
+    /**
+     * Handle drop event
+     * @param {DragEvent} e - Drag event
+     * @param {HTMLElement} zone - Drop zone element
+     */
+    handleDrop: function(e, zone) {
+      e.preventDefault();
+      zone.classList.remove("is-drag-over");
+      zone.dispatchEvent(new CustomEvent("draggable:drop", {
+        bubbles: true,
+        detail: {
+          zone,
+          element: this.currentDrag?.element,
+          data: this.currentDrag?.data,
+          position: { x: e.clientX, y: e.clientY }
+        }
+      }));
+    },
+    /**
+     * Reorder elements in container based on cursor position
+     * @param {HTMLElement} container 
+     * @param {HTMLElement} element 
+     * @param {number} clientX 
+     * @param {number} clientY 
+     */
+    handleReorder: function(container, element, clientX, clientY) {
+      const isVertical = container.classList.contains("vd-draggable-container-vertical");
+      const siblings = [...container.querySelectorAll(".vd-draggable-item:not(.is-dragging), .vd-draggable:not(.is-dragging)")];
+      const nextSibling = siblings.reduce((closest, child) => {
+        const box = child.getBoundingClientRect();
+        const offset = isVertical ? clientY - box.top - box.height / 2 : clientX - box.left - box.width / 2;
+        if (offset < 0 && offset > closest.offset) {
+          return { offset, element: child };
+        } else {
+          return closest;
+        }
+      }, { offset: Number.NEGATIVE_INFINITY }).element;
+      if (nextSibling == null) {
+        container.appendChild(element);
+      } else {
+        container.insertBefore(element, nextSibling);
+      }
+    },
+    /**
+     * Handle keyboard events
+     * @param {KeyboardEvent} e - Keyboard event
+     * @param {HTMLElement} element - Draggable element
+     */
+    handleKeydown: function(e, element) {
+      switch (e.key) {
+        case "Enter":
+        case " ":
+          e.preventDefault();
+          element.click();
+          break;
+        case "Escape":
+          if (element.classList.contains("is-dragging")) {
+            element.classList.remove("is-dragging");
+            element.setAttribute("aria-grabbed", "false");
+            if (this.feedbackElement) {
+              this.feedbackElement.classList.add("hidden");
+            }
+            this.currentDrag = null;
+          }
+          break;
+        case "ArrowUp":
+        case "ArrowLeft": {
+          e.preventDefault();
+          const prev = element.previousElementSibling;
+          if (prev && (prev.classList.contains("vd-draggable") || prev.classList.contains("vd-draggable-item"))) {
+            element.parentNode.insertBefore(element, prev);
+            element.focus();
+            element.dispatchEvent(new CustomEvent("draggable:reorder", {
+              bubbles: true,
+              detail: { element, direction: "up" }
+            }));
+          }
+          break;
+        }
+        case "ArrowDown":
+        case "ArrowRight": {
+          e.preventDefault();
+          const next = element.nextElementSibling;
+          if (next && (next.classList.contains("vd-draggable") || next.classList.contains("vd-draggable-item"))) {
+            element.parentNode.insertBefore(next, element);
+            element.focus();
+            element.dispatchEvent(new CustomEvent("draggable:reorder", {
+              bubbles: true,
+              detail: { element, direction: "down" }
+            }));
+          }
+          break;
+        }
+      }
+    },
+    /**
+     * Get data from draggable element
+     * @param {HTMLElement} element - Draggable element
+     * @returns {string} Data associated with the element
+     */
+    getData: function(element) {
+      return element.dataset.draggable || element.textContent.trim();
+    },
+    /**
+     * Update drag feedback element
+     * @param {number} x - Current X coordinate
+     * @param {number} y - Current Y coordinate
+     */
+    updateFeedback: function(x, y) {
+      if (!this.currentDrag) return;
+      this.feedbackElement.classList.remove("hidden");
+      const rect = this.currentDrag.initialBounds;
+      this.feedbackElement.innerHTML = "";
+      const clone = this.currentDrag.element.cloneNode(true);
+      this.feedbackElement.appendChild(clone);
+      Object.assign(this.feedbackElement.style, {
+        left: x - 20 + "px",
+        top: y - 20 + "px",
+        width: rect.width + "px",
+        height: rect.height + "px"
+      });
+    },
+    /**
+     * Make an element draggable programmatically
+     * @param {HTMLElement|string} element - Element or selector
+     * @param {Object} options - Configuration options
+     */
+    makeDraggable: function(element, options = {}) {
+      const el = typeof element === "string" ? document.querySelector(element) : element;
+      if (el && !this.instances.has(el)) {
+        el.classList.add("vd-draggable");
+        el.setAttribute("draggable", "true");
+        if (options.data) {
+          el.dataset.draggable = options.data;
+        }
+        this.initDraggable(el);
+      }
+    },
+    /**
+     * Remove draggable functionality from an element
+     * @param {HTMLElement|string} element - Element or selector
+     */
+    removeDraggable: function(element) {
+      const el = typeof element === "string" ? document.querySelector(element) : element;
+      if (el && this.instances.has(el)) {
+        const instance = this.instances.get(el);
+        instance.cleanup.forEach((fn) => fn());
+        this.instances.delete(el);
+        el.classList.remove("vd-draggable");
+        el.removeAttribute("draggable");
+        el.removeAttribute("data-draggable");
+      }
+    },
+    /**
+     * Destroy a draggable instance and clean up event listeners
+     * @param {HTMLElement} element - Draggable element
+     */
+    destroy: function(element) {
+      this.removeDraggable(element);
+    },
+    /**
+     * Destroy all draggable instances
+     */
+    destroyAll: function() {
+      const instances = Array.from(this.instances.keys());
+      instances.forEach((element) => this.destroy(element));
+    }
+  };
+  if (typeof window.Vanduo !== "undefined") {
+    window.Vanduo.register("draggable", Draggable);
+  }
+  window.VanduoDraggable = Draggable;
 })();
 
 // js/index.js
