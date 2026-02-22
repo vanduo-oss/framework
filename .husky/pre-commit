@@ -25,6 +25,14 @@ if [ "$docs_only" = true ]; then
 	exit 0
 fi
 
+# Quick security audit before committing
+echo "Running security audit..."
+pnpm audit --audit-level=high 2>/dev/null || {
+    echo "⚠️  Security vulnerabilities found. Run 'pnpm audit' for details."
+    echo "To proceed anyway: git commit --no-verify"
+    exit 1
+}
+
 # Run build to ensure dist/ is up to date with latest changes
 echo "Running Vanduo build before commit..."
 pnpm run build

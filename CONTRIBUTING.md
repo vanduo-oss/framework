@@ -8,6 +8,30 @@ The framework is in an early stage and we are not yet accepting external contrib
 
 We genuinely appreciate your enthusiasm. Please check back later as we plan to open contributions once the project stabilizes.
 
+## Development Setup
+
+### Prerequisites
+
+- **Node.js ≥ 18** (20+ recommended)
+- **Corepack enabled**: `corepack enable` (ships with Node.js, activates pnpm)
+
+### First-time Setup
+
+```sh
+corepack enable          # Activates pnpm from packageManager field
+pnpm install             # Installs dependencies
+pnpm run build           # Verifies build works
+pnpm test                # Runs test suite
+```
+
+### Security Rules
+
+1. **Never use `npm install` or `yarn`** — always use `pnpm`
+2. **Never run `--ignore-scripts` globally** — use `pnpm.allowedBuilds` in `package.json`
+3. **Review `pnpm audit`** output before merging PRs
+4. **Pin exact versions** — `save-exact=true` is enforced by `.npmrc`
+5. **Adding new dependencies** requires team review (PR description must justify the addition)
+
 ## How You Can Help Right Now
 
 Even though code contributions are paused, you can still support the project by:

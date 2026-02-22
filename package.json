@@ -76,5 +76,11 @@
     "node": ">=18.0.0",
     "pnpm": ">=8.0.0"
   },
+  "pnpm": {
+    "allowedBuilds": {
+      "esbuild": true,
+      "@playwright/test": true
+    }
+  },
   "packageManager": "pnpm@10.28.2"
 }
