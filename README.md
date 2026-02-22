@@ -54,15 +54,13 @@ Stop wrapping everything in bloated container DOMs. Build beautiful, accessible 
 
 ### Option 1: Package Manager (Recommended)
 
-Install using your preferred package manager to easily integrate Vanduo with modern build tools and bundlers:
+**We strongly recommend using [pnpm](https://pnpm.io/)** for installing Vanduo Framework. Vanduo is strictly configured with `.npmrc` security policies (such as blocking exotic sub-dependencies and strict peer enforcement) that work best with inside the pnpm ecosystem.
 
 ```bash
 pnpm add vanduo-framework
-# or
-npm install vanduo-framework
-# or
-yarn add vanduo-framework
 ```
+
+*(Note: While `npm install vanduo-framework` and `yarn add vanduo-framework` will still technically work, they do not inherently enforce the same strict lockfile and isolated `node_modules` security guarantees that pnpm provides out-of-the-box).*
 
 ### Option 2: CDN (Fastest)
 
