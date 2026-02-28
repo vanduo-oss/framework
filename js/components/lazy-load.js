@@ -61,6 +61,11 @@
     function _safeInjectHtml(containerEl, html) {
         const parser = new DOMParser();
         const doc = parser.parseFromString(html.trim(), 'text/html');
+        // Strip out scripts to prevent execution upon adoption
+        const scripts = doc.querySelectorAll('script');
+        for (let i = 0; i < scripts.length; i++) {
+            scripts[i].parentNode.removeChild(scripts[i]);
+        }
         // Collect all top-level body children
         const nodes = Array.from(doc.body.childNodes);
         // Clear container and append parsed nodes
@@ -221,14 +226,18 @@
             // Placeholders are known-safe static HTML strings built internally
             const placeholderHtml = _resolvePlaceholder(opts.placeholder);
 
-            // Show placeholder immediately (static, known-safe string)
-            containerEl.innerHTML = placeholderHtml; // nosec — controlled static string
+            // Use _safeInjectHtml instead of innerHTML to prevent XSS from caller-supplied placeholders
+            _safeInjectHtml(containerEl, placeholderHtml);
             _dispatch(containerEl, 'lazysection:loading', { url: url });
 
             // Fetch when visible
             this.observe(containerEl, function () {
-                window.fetch(url)
+                const controller = new AbortController();
+                const timeoutId = setTimeout(function () { controller.abort(); }, 10000);
+
+                window.fetch(url, { signal: controller.signal })
                     .then(function (res) {
+                        clearTimeout(timeoutId);
                         if (!res.ok) throw new Error('HTTP ' + res.status);
                         return res.text();
                     })
@@ -283,15 +292,21 @@
             const elements = document.querySelectorAll('[data-vd-lazy]');
             elements.forEach(function (el) {
                 // Skip already-observed or already-loaded elements
-                if (_observerMap.has(el) || el.dataset.vdLazyLoaded === 'true') return;
+                if (_observerMap.has(el) || el.dataset.vdLazyState === 'loading' || el.dataset.vdLazyState === 'loaded') return;
 
                 const url = el.getAttribute('data-vd-lazy');
+                if (!url) return;
+
+                el.dataset.vdLazyState = 'loading';
                 const placeholder = el.getAttribute('data-vd-lazy-placeholder') || 'skeleton';
 
                 self.loadSection(url, el, {
                     placeholder: placeholder,
                     onLoaded: function () {
-                        el.dataset.vdLazyLoaded = 'true';
+                        el.dataset.vdLazyState = 'loaded';
+                    },
+                    onError: function () {
+                        el.dataset.vdLazyState = 'error';
                     }
                 });
             });

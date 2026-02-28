@@ -78,9 +78,12 @@ test.describe('LazyLoad Component @component', () => {
         });
 
         test('spinner placeholder renders .vd-dynamic-loader while fetching', async ({ page }) => {
-            // Intercept the request to introduce a delay so we can catch the spinner
+            let releaseRoute: () => void;
+            const routePromise = new Promise<void>((resolve) => { releaseRoute = resolve; });
+
+            // Intercept the request and hold it so we can catch the spinner
             await page.route('/tests/fixtures/lazy-load-partial.html', async (route) => {
-                await new Promise<void>((r) => setTimeout(r, 600));
+                await routePromise;
                 await route.continue();
             });
 
@@ -102,6 +105,9 @@ test.describe('LazyLoad Component @component', () => {
             // Spinner is rendered immediately (before IO fires the fetch)
             const spinner = page.locator('#prog-target .vd-dynamic-loader').first();
             await expect(spinner).toBeVisible({ timeout: 3000 });
+
+            // Now that we saw the spinner, let the fetch finish
+            releaseRoute!();
 
             // Wait for actual content to arrive before unrouting (avoids route leak)
             await page.waitForFunction(
@@ -149,7 +155,7 @@ test.describe('LazyLoad Component @component', () => {
         test('calling init() twice does not double-load already-loaded element', async ({ page }) => {
             await page.waitForFunction(() => {
                 const el = document.getElementById('attr-lazy-target') as HTMLElement | null;
-                return el != null && el.dataset.vdLazyLoaded === 'true';
+                return el != null && el.dataset.vdLazyState === 'loaded';
             }, { timeout: 5000 });
 
             await page.evaluate(() => window.VanduoLazyLoad.init());
@@ -235,12 +241,14 @@ test.describe('LazyLoad Component @component', () => {
 
     test.describe('Error handling', () => {
         test('shows error UI when URL returns 404', async ({ page }) => {
+            await page.evaluate(() => document.getElementById('error-target')!.scrollIntoView());
             await page.click('#btn-load-error');
             const errorAlert = page.locator('#error-target .vd-alert-error');
             await expect(errorAlert).toBeVisible({ timeout: 5000 });
         });
 
         test('error UI contains "Failed to load content" message', async ({ page }) => {
+            await page.evaluate(() => document.getElementById('error-target')!.scrollIntoView());
             await page.click('#btn-load-error');
             await page.waitForFunction(
                 () => !!document.querySelector('#error-target .vd-alert-error'),
@@ -259,6 +267,7 @@ test.describe('LazyLoad Component @component', () => {
                     window.__unobserveCallbackFired = true;
                 }, { once: true });
             });
+            await page.evaluate(() => document.getElementById('error-target')!.scrollIntoView());
             await page.click('#btn-load-error');
             await page.waitForFunction(
                 () => window.__unobserveCallbackFired === true,
