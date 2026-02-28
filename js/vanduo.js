@@ -1,23 +1,23 @@
 /**
  * Vanduo Framework - Main JavaScript File
- * v1.2.0
+ * v1.2.1
  */
 
-(function() {
+(function () {
   'use strict';
 
   /**
    * Vanduo Framework Object
    */
   const Vanduo = {
-    version: '1.2.0',
+    version: '1.2.1',
     components: {},
 
     /**
      * Initialize framework
      * Call this after DOM is ready and all components are loaded
      */
-    init: function() {
+    init: function () {
       // Initialize components when DOM is ready
       if (typeof ready !== 'undefined') {
         ready(() => {
@@ -38,7 +38,7 @@
     /**
      * Initialize all components
      */
-    initComponents: function() {
+    initComponents: function () {
       // Initialize all registered components
       Object.keys(this.components).forEach((name) => {
         const component = this.components[name];
@@ -51,7 +51,7 @@
         }
       });
 
-      console.log('Vanduo Framework v1.2.0 initialized');
+      console.log('Vanduo Framework v1.2.1 initialized');
     },
 
     /**
@@ -59,7 +59,7 @@
      * @param {string} name - Component name
      * @param {Object} component - Component object with init method
      */
-    register: function(name, component) {
+    register: function (name, component) {
       this.components[name] = component;
       // Note: Components are NOT auto-initialized on registration
       // Call Vanduo.init() explicitly after all components are registered
@@ -69,7 +69,7 @@
      * Re-initialize a component (useful after dynamic DOM changes)
      * @param {string} name - Component name
      */
-    reinit: function(name) {
+    reinit: function (name) {
       const component = this.components[name];
       if (component && component.init && typeof component.init === 'function') {
         try {
@@ -84,7 +84,7 @@
      * Destroy all component instances and clean up event listeners
      * Uses lifecycle manager for memory leak prevention
      */
-    destroyAll: function() {
+    destroyAll: function () {
       // First, destroy components that have their own destroyAll
       const names = Object.keys(this.components);
       for (let i = 0; i < names.length; i++) {
@@ -109,7 +109,7 @@
      * @param {string} name - Component name
      * @returns {Object|null}
      */
-    getComponent: function(name) {
+    getComponent: function (name) {
       return this.components[name] || null;
     }
   };

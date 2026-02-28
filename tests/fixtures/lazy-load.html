@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LazyLoad Test Fixture</title>
+  <link rel="stylesheet" href="/css/vanduo.css">
+  <style>
+    /* Scroll sentinel: tall spacer to push target below the fold */
+    .tall-spacer { height: 200vh; background: transparent; }
+    .test-section { padding: 2rem; }
+  </style>
+</head>
+<body>
+  <div class="container test-section">
+    <h1>LazyLoad Component Test Fixture</h1>
+
+    <!-- ── Attribute-driven, visible immediately (no spacer above) ── -->
+    <p>Attribute-driven target (visible on load):</p>
+    <div id="attr-lazy-target"
+         data-vd-lazy="/tests/fixtures/lazy-load-partial.html"
+         data-vd-lazy-placeholder="skeleton">
+      <!-- replaced on init+intersect -->
+    </div>
+
+    <!-- ── Attribute-driven, below fold ── -->
+    <div class="tall-spacer" aria-hidden="true"></div>
+
+    <div id="attr-lazy-below-fold"
+         data-vd-lazy="/tests/fixtures/lazy-load-partial.html"
+         data-vd-lazy-placeholder="spinner">
+    </div>
+
+    <!-- ── Programmatic targets ── -->
+    <div id="prog-target" style="min-height:80px;border:1px dashed #ccc;padding:1rem;margin-top:2rem;">
+      Programmatic target (unmodified initially)
+    </div>
+
+    <div id="error-target" style="min-height:80px;border:1px dashed #ccc;padding:1rem;margin-top:1rem;">
+      Error target (unmodified initially)
+    </div>
+
+    <!-- ── Unobserve test target ── -->
+    <div id="unobserve-target" style="min-height:80px;border:1px dashed #ccc;padding:1rem;margin-top:1rem;">
+      Unobserve target (should NOT be replaced)
+    </div>
+
+    <!-- ── Controls ── -->
+    <div style="margin-top:2rem;display:flex;flex-wrap:wrap;gap:.5rem;">
+      <button id="btn-load-section" class="vd-btn vd-btn-primary">loadSection() programmatic</button>
+      <button id="btn-load-error" class="vd-btn vd-btn-error">loadSection() 404</button>
+      <button id="btn-observe-prog" class="vd-btn vd-btn-secondary">observe() then scroll</button>
+      <button id="btn-unobserve" class="vd-btn vd-btn-outline">unobserve target</button>
+      <button id="btn-unobserve-all" class="vd-btn vd-btn-outline">unobserveAll()</button>
+    </div>
+
+    <!-- ── Event log ── -->
+    <div id="event-log" style="margin-top:1rem;font-size:.85rem;color:var(--text-secondary,#666);">
+      Events: <span id="event-log-text">(none)</span>
+    </div>
+  </div>
+
+  <script src="/js/utils/helpers.js"></script>
+  <script src="/js/utils/lifecycle.js"></script>
+  <script src="/js/vanduo.js"></script>
+  <script src="/js/components/lazy-load.js"></script>
+
+  <script>
+    // ── Event logging ──────────────────────────────────────
+    var logEl = document.getElementById('event-log-text');
+    function logEvent(name) {
+      var prev = logEl.textContent === '(none)' ? '' : logEl.textContent + ' | ';
+      logEl.textContent = prev + name;
+    }
+
+    ['lazysection:loading', 'lazysection:loaded', 'lazysection:error'].forEach(function (evt) {
+      document.addEventListener(evt, function (e) {
+        logEvent(evt + '(' + (e.target && e.target.id) + ')');
+      });
+    });
+
+    // ── Programmatic loadSection() ────────────────────────
+    document.getElementById('btn-load-section').addEventListener('click', function () {
+      VanduoLazyLoad.loadSection(
+        '/tests/fixtures/lazy-load-partial.html',
+        document.getElementById('prog-target'),
+        { placeholder: 'spinner' }
+      );
+    });
+
+    // ── loadSection() with 404 URL ─────────────────────────
+    document.getElementById('btn-load-error').addEventListener('click', function () {
+      VanduoLazyLoad.loadSection(
+        '/tests/fixtures/nonexistent-404.html',
+        document.getElementById('error-target')
+      );
+    });
+
+    // ── observe() and unobserve() ─────────────────────────
+    document.getElementById('btn-observe-prog').addEventListener('click', function () {
+      var target = document.getElementById('unobserve-target');
+      VanduoLazyLoad.observe(target, function () {
+        target.textContent = 'OBSERVED AND TRIGGERED';
+      });
+    });
+
+    document.getElementById('btn-unobserve').addEventListener('click', function () {
+      VanduoLazyLoad.unobserve(document.getElementById('unobserve-target'));
+    });
+
+    document.getElementById('btn-unobserve-all').addEventListener('click', function () {
+      VanduoLazyLoad.unobserveAll();
+    });
+
+    // ── Init (wires [data-vd-lazy] elements) ──────────────
+    Vanduo.init();
+  </script>
+</body>
+</html>
