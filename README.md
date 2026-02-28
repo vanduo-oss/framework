@@ -88,8 +88,8 @@ Load directly from jsDelivr — no download required:
 
 **Pin to a specific version** (recommended for production):
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Nostromo-618/vanduo-framework@v1.2.0/dist/vanduo.min.css">
-<script src="https://cdn.jsdelivr.net/gh/Nostromo-618/vanduo-framework@v1.2.0/dist/vanduo.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Nostromo-618/vanduo-framework@v1.2.1/dist/vanduo.min.css">
+<script src="https://cdn.jsdelivr.net/gh/Nostromo-618/vanduo-framework@v1.2.1/dist/vanduo.min.js"></script>
 <script>Vanduo.init();</script>
 ```
 
@@ -153,7 +153,7 @@ This project includes an [`llms.txt`](llms.txt) file — a structured markdown s
 Use the hardened upload script to attach only approved bundle artifacts from `dist/`:
 
 ```bash
-pnpm run release:assets -- v1.2.0
+pnpm run release:assets -- v1.2.1
 ```
 
 Notes:
