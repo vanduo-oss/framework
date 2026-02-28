@@ -232,7 +232,7 @@
 
             // Fetch when visible
             this.observe(containerEl, function () {
-                const controller = new AbortController();
+                const controller = new window.AbortController();
                 const timeoutId = setTimeout(function () { controller.abort(); }, 10000);
 
                 window.fetch(url, { signal: controller.signal })
