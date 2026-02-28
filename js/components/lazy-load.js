@@ -60,12 +60,14 @@
      */
     function _safeInjectHtml(containerEl, html) {
         const parser = new DOMParser();
-        // lgtm [js/xss-through-dom] — we manually sanitize the output nodes below
-        const doc = parser.parseFromString(html.trim(), 'text/html');
-        // Strip out scripts to prevent execution upon adoption
-        const scripts = doc.querySelectorAll('script');
-        for (let i = 0; i < scripts.length; i++) {
-            scripts[i].parentNode.removeChild(scripts[i]);
+        const doc = parser.parseFromString(html.trim(), 'text/html'); // CodeQL [js/xss-through-dom] Intentional: parsed nodes are sanitized below before adoption into live DOM
+
+        const DANGEROUS_TAGS = ['SCRIPT', 'IFRAME', 'OBJECT', 'EMBED', 'FORM', 'BASE', 'LINK', 'META', 'STYLE'];
+        for (const tag of DANGEROUS_TAGS) {
+            const els = doc.querySelectorAll(tag);
+            for (let i = els.length - 1; i >= 0; i--) {
+                els[i].parentNode.removeChild(els[i]);
+            }
         }
 
         // Strip dangerous attributes (e.g. onerror, javascript: urls) from all elements
@@ -75,7 +77,13 @@
                 for (let i = attrs.length - 1; i >= 0; i--) {
                     const attrName = attrs[i].name.toLowerCase();
                     const attrValue = attrs[i].value.toLowerCase();
-                    if (attrName.startsWith('on') || attrValue.trim().startsWith('javascript:')) {
+                    const trimmedValue = attrValue.trim();
+                    if (
+                        attrName.startsWith('on') ||
+                        trimmedValue.startsWith('javascript:') ||
+                        trimmedValue.startsWith('data:') ||
+                        trimmedValue.startsWith('vbscript:')
+                    ) {
                         node.removeAttribute(attrs[i].name);
                     }
                 }
