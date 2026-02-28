@@ -1,6 +1,6 @@
 {
   "name": "vanduo-framework",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Zero-dependency CSS/JS framework built on Fibonacci/Golden Ratio design system with Open Color integration",
   "keywords": [
     "css",

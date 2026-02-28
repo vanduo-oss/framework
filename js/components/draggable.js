@@ -98,17 +98,20 @@
       cleanupFunctions.push(() => element.removeEventListener('touchstart', touchStartHandler));
 
       // Handle touch move (for mobile)
+      // { passive: false } is required so that e.preventDefault() works
+      // once the drag threshold is reached — without it, modern browsers
+      // treat the listener as passive and silently ignore preventDefault().
       const touchMoveHandler = (e) => {
         this.handleTouchMove(e, element);
       };
-      element.addEventListener('touchmove', touchMoveHandler);
+      element.addEventListener('touchmove', touchMoveHandler, { passive: false });
       cleanupFunctions.push(() => element.removeEventListener('touchmove', touchMoveHandler));
 
       // Handle touch end (for mobile)
       const touchEndHandler = (e) => {
         this.handleTouchEnd(e, element);
       };
-      element.addEventListener('touchend', touchEndHandler);
+      element.addEventListener('touchend', touchEndHandler, { passive: false });
       cleanupFunctions.push(() => element.removeEventListener('touchend', touchEndHandler));
 
       // Handle touch cancel (for mobile)
@@ -390,7 +393,7 @@
       // Only start dragging if moved a minimum distance
       if (Math.abs(deltaX) > 10 || Math.abs(deltaY) > 10) {
         // Now we know it's a drag, not a scroll — prevent default
-        e.preventDefault();
+        if (e.cancelable) e.preventDefault();
 
         if (!this.touchState.isDragging) {
           this.touchState.isDragging = true;
@@ -447,7 +450,7 @@
      */
     handleTouchEnd: function (e, element) {
       if (this.touchState && this.touchState.isDragging) {
-        e.preventDefault();
+        if (e.cancelable) e.preventDefault();
 
         element.classList.remove('is-dragging');
         element.classList.add('is-dropped');
