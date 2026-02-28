@@ -1,0 +1,67 @@
+author:	kilo-code-bot
+association:	none
+edited:	true
+status:	none
+--
+<!-- kilo-review -->
+## Code Review Summary
+
+**Status:** 6 Issues Found | **Recommendation:** Address before merge
+
+### Overview
+| Severity | Count |
+|----------|-------|
+| CRITICAL | 1 |
+| WARNING | 3 |
+| SUGGESTION | 2 |
+
+<details>
+<summary><b>Issue Details (click to expand)</b></summary>
+
+#### CRITICAL
+| File | Line | Issue |
+|------|------|-------|
+| `js/components/lazy-load.js` | 225 | DOM text reinterpreted as HTML (CodeQL alert) |
+
+#### WARNING
+| File | Line | Issue |
+|------|------|-------|
+| `js/components/lazy-load.js` | 241 | Full framework re-initialization on every lazy load |
+| `js/components/lazy-load.js` | 286 | Race condition risk with double-observation guard |
+| `js/components/lazy-load.js` | 288 | Missing null check for data-vd-lazy attribute |
+
+#### SUGGESTION
+| File | Line | Issue |
+|------|------|-------|
+| `js/components/lazy-load.js` | 230 | No timeout handling for fetch requests |
+| `tests/components/lazy-load.spec.ts` | 73 | Hard-coded wait time may cause flaky tests |
+
+</details>
+
+<details>
+<summary><b>Other Observations (not in diff)</b></summary>
+
+Issues found in unchanged code that cannot receive inline comments:
+
+| File | Line | Issue |
+|------|------|-------|
+| `js/components/lazy-load.js` | 103 | `_resolvePlaceholder()` accepts arbitrary HTML strings |
+| `js/components/lazy-load.js` | 70 | `_safeInjectHtml()` uses `document.adoptNode()` without checking for script execution |
+
+</details>
+
+<details>
+<summary><b>Files Reviewed (7 files)</b></summary>
+
+- `js/components/lazy-load.js` - 5 issues
+- `js/index.js` - no issues
+- `js/vanduo.js` - version bump only
+- `tests/components/lazy-load.spec.ts` - 1 issue
+- `tests/fixtures/lazy-load.html` - no issues
+- `tests/fixtures/lazy-load-partial.html` - no issues
+- `package.json` - dependency updates
+
+</details>
+
+[Fix these issues in Kilo Cloud](https://app.kilo.ai/cloud-agent-fork/review/1c58ca02-142c-44c4-a0e1-b7312b1085f4)
+--

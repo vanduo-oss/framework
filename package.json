@@ -1,6 +1,6 @@
 {
   "name": "vanduo-framework",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Zero-dependency CSS/JS framework built on Fibonacci/Golden Ratio design system with Open Color integration",
   "keywords": [
     "css",
@@ -66,10 +66,10 @@
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.58.2",
     "esbuild": "^0.27.3",
-    "eslint": "^10.0.1",
+    "eslint": "^10.0.2",
     "husky": "^9.1.7",
     "lightningcss": "^1.31.1",
-    "stylelint": "^17.3.0",
+    "stylelint": "^17.4.0",
     "stylelint-config-standard": "^40.0.0"
   },
   "engines": {
