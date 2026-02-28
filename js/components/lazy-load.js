@@ -60,12 +60,33 @@
      */
     function _safeInjectHtml(containerEl, html) {
         const parser = new DOMParser();
+        // lgtm [js/xss-through-dom] — we manually sanitize the output nodes below
         const doc = parser.parseFromString(html.trim(), 'text/html');
         // Strip out scripts to prevent execution upon adoption
         const scripts = doc.querySelectorAll('script');
         for (let i = 0; i < scripts.length; i++) {
             scripts[i].parentNode.removeChild(scripts[i]);
         }
+
+        // Strip dangerous attributes (e.g. onerror, javascript: urls) from all elements
+        function _sanitizeNode(node) {
+            if (node.nodeType === Node.ELEMENT_NODE) {
+                const attrs = node.attributes;
+                for (let i = attrs.length - 1; i >= 0; i--) {
+                    const attrName = attrs[i].name.toLowerCase();
+                    const attrValue = attrs[i].value.toLowerCase();
+                    if (attrName.startsWith('on') || attrValue.trim().startsWith('javascript:')) {
+                        node.removeAttribute(attrs[i].name);
+                    }
+                }
+                const children = node.childNodes;
+                for (let i = 0; i < children.length; i++) {
+                    _sanitizeNode(children[i]);
+                }
+            }
+        }
+        _sanitizeNode(doc.body);
+
         // Collect all top-level body children
         const nodes = Array.from(doc.body.childNodes);
         // Clear container and append parsed nodes
