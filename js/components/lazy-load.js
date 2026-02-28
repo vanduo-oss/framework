@@ -44,7 +44,7 @@
     function _isSafeUrl(url) {
         try {
             // Relative URLs (no origin) are always safe
-            var resolved = new URL(url, window.location.href);
+            const resolved = new URL(url, window.location.href);
             return resolved.origin === window.location.origin;
         } catch (_) {
             return false;
@@ -59,10 +59,10 @@
      * @param {string} html
      */
     function _safeInjectHtml(containerEl, html) {
-        var parser = new DOMParser();
-        var doc = parser.parseFromString(html.trim(), 'text/html');
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html.trim(), 'text/html');
         // Collect all top-level body children
-        var nodes = Array.from(doc.body.childNodes);
+        const nodes = Array.from(doc.body.childNodes);
         // Clear container and append parsed nodes
         while (containerEl.firstChild) {
             containerEl.removeChild(containerEl.firstChild);
@@ -141,10 +141,10 @@
             // Already observed — ignore
             if (_observerMap.has(element)) return;
 
-            var threshold = (options && options.threshold != null) ? options.threshold : 0;
-            var rootMargin = (options && options.rootMargin) ? options.rootMargin : '0px';
+            const threshold = (options && options.threshold != null) ? options.threshold : 0;
+            const rootMargin = (options && options.rootMargin) ? options.rootMargin : '0px';
 
-            var observer = new IntersectionObserver(function (entries, obs) {
+            const observer = new IntersectionObserver(function (entries, obs) {
                 entries.forEach(function (entry) {
                     if (entry.isIntersecting) {
                         obs.unobserve(entry.target);
@@ -167,7 +167,7 @@
          * @param {Element} element
          */
         unobserve: function (element) {
-            var observer = _observerMap.get(element);
+            const observer = _observerMap.get(element);
             if (observer) {
                 observer.unobserve(element);
                 _observerMap.delete(element);
@@ -217,9 +217,9 @@
                 return;
             }
 
-            var opts = options || {};
+            const opts = options || {};
             // Placeholders are known-safe static HTML strings built internally
-            var placeholderHtml = _resolvePlaceholder(opts.placeholder);
+            const placeholderHtml = _resolvePlaceholder(opts.placeholder);
 
             // Show placeholder immediately (static, known-safe string)
             containerEl.innerHTML = placeholderHtml; // nosec — controlled static string
@@ -227,7 +227,7 @@
 
             // Fetch when visible
             this.observe(containerEl, function () {
-                fetch(url)
+                window.fetch(url)
                     .then(function (res) {
                         if (!res.ok) throw new Error('HTTP ' + res.status);
                         return res.text();
@@ -247,12 +247,12 @@
                     })
                     .catch(function (err) {
                         // Build error node via DOM APIs — no dynamic HTML strings
-                        var alertEl = document.createElement('div');
+                        const alertEl = document.createElement('div');
                         alertEl.className = 'vd-alert vd-alert-error';
                         alertEl.setAttribute('role', 'alert');
-                        var msgEl = document.createElement('span');
+                        const msgEl = document.createElement('span');
                         msgEl.textContent = 'Failed to load content. ';
-                        var detailEl = document.createElement('small');
+                        const detailEl = document.createElement('small');
                         detailEl.style.opacity = '0.7';
                         detailEl.textContent = err.message;
                         alertEl.appendChild(msgEl);
@@ -279,14 +279,14 @@
          * Safe to call multiple times — already-observed elements are skipped.
          */
         init: function () {
-            var self = this;
-            var elements = document.querySelectorAll('[data-vd-lazy]');
+            const self = this;
+            const elements = document.querySelectorAll('[data-vd-lazy]');
             elements.forEach(function (el) {
                 // Skip already-observed or already-loaded elements
                 if (_observerMap.has(el) || el.dataset.vdLazyLoaded === 'true') return;
 
-                var url = el.getAttribute('data-vd-lazy');
-                var placeholder = el.getAttribute('data-vd-lazy-placeholder') || 'skeleton';
+                const url = el.getAttribute('data-vd-lazy');
+                const placeholder = el.getAttribute('data-vd-lazy-placeholder') || 'skeleton';
 
                 self.loadSection(url, el, {
                     placeholder: placeholder,
