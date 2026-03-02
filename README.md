@@ -1,14 +1,14 @@
-# Vanduo Framework v1.2.2
+# Vanduo Framework v1.2.3
 
 <p align="center">
   <img src="vanduo-banner.svg" alt="Vanduo Framework Banner" width="100%">
 </p>
 
 <p align="center">
-  <a href="https://www.npmjs.com/package/vanduo-framework"><img src="https://img.shields.io/npm/v/vanduo-framework?style=flat-square&color=3b82f6" alt="NPM Version"></a>
-  <a href="https://github.com/Nostromo-618/vanduo-framework/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/Nostromo-618/vanduo-framework/ci.yml?branch=main&style=flat-square&color=10b981" alt="Build Status"></a>
-  <a href="https://github.com/Nostromo-618/vanduo-framework/blob/main/dist/vanduo.min.css"><img src="https://img.shields.io/badge/minified_size-~110kb-8b5cf6?style=flat-square" alt="Minified Size"></a>
-  <a href="https://github.com/Nostromo-618/vanduo-framework/blob/main/LICENSE"><img src="https://img.shields.io/github/license/Nostromo-618/vanduo-framework?style=flat-square&color=64748b" alt="License"></a>
+  <a href="https://www.npmjs.com/package/@vanduo-oss/framework"><img src="https://img.shields.io/npm/v/@vanduo-oss/framework?style=flat-square&color=3b82f6" alt="NPM Version"></a>
+  <a href="https://github.com/vanduo-oss/framework/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/vanduo-oss/framework/ci.yml?branch=main&style=flat-square&color=10b981" alt="Build Status"></a>
+  <a href="https://github.com/vanduo-oss/framework/blob/main/dist/vanduo.min.css"><img src="https://img.shields.io/badge/minified_size-~110kb-8b5cf6?style=flat-square" alt="Minified Size"></a>
+  <a href="https://github.com/vanduo-oss/framework/blob/main/LICENSE"><img src="https://img.shields.io/github/license/vanduo-oss/framework?style=flat-square&color=64748b" alt="License"></a>
 </p>
 
 **Essential just like water is.** 
@@ -57,10 +57,10 @@ Stop wrapping everything in bloated container DOMs. Build beautiful, accessible 
 **We strongly recommend using [pnpm](https://pnpm.io/)** for installing Vanduo Framework. Vanduo is strictly configured with `.npmrc` security policies (such as blocking exotic sub-dependencies and strict peer enforcement) that work best with inside the pnpm ecosystem.
 
 ```bash
-pnpm add vanduo-framework
+pnpm add @vanduo-oss/framework
 ```
 
-*(Note: While `npm install vanduo-framework` and `yarn add vanduo-framework` will still technically work, they do not inherently enforce the same strict lockfile and isolated `node_modules` security guarantees that pnpm provides out-of-the-box).*
+*(Note: While `npm install @vanduo-oss/framework` and `yarn add @vanduo-oss/framework` will still technically work, they do not inherently enforce the same strict lockfile and isolated `node_modules` security guarantees that pnpm provides out-of-the-box).*
 
 ### Option 2: CDN (Fastest)
 
@@ -74,13 +74,13 @@ Load directly from jsDelivr — no download required:
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Website</title>
     <!-- Vanduo CSS via CDN -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Nostromo-618/vanduo-framework@main/dist/vanduo.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/vanduo-oss/framework@main/dist/vanduo.min.css">
 </head>
 <body>
     <!-- Your content here -->
     
     <!-- Vanduo JS via CDN -->
-    <script src="https://cdn.jsdelivr.net/gh/Nostromo-618/vanduo-framework@main/dist/vanduo.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/vanduo-oss/framework@main/dist/vanduo.min.js"></script>
     <script>Vanduo.init();</script>
 </body>
 </html>
@@ -88,15 +88,15 @@ Load directly from jsDelivr — no download required:
 
 **Pin to a specific version** (recommended for production):
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Nostromo-618/vanduo-framework@v1.2.2/dist/vanduo.min.css">
-<script src="https://cdn.jsdelivr.net/gh/Nostromo-618/vanduo-framework@v1.2.2/dist/vanduo.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/vanduo-oss/framework@v1.2.3/dist/vanduo.min.css">
+<script src="https://cdn.jsdelivr.net/gh/vanduo-oss/framework@v1.2.3/dist/vanduo.min.js"></script>
 <script>Vanduo.init();</script>
 ```
 
 
 ### Option 3: Download
 
-[**Download dist/ folder**](https://github.com/Nostromo-618/vanduo-framework/tree/main/dist) and include locally:
+[**Download dist/ folder**](https://github.com/vanduo-oss/framework/tree/main/dist) and include locally:
 
 ```html
 <!DOCTYPE html>
@@ -153,7 +153,7 @@ This project includes an [`llms.txt`](llms.txt) file — a structured markdown s
 Use the hardened upload script to attach only approved bundle artifacts from `dist/`:
 
 ```bash
-pnpm run release:assets -- v1.2.2
+pnpm run release:assets -- v1.2.3
 ```
 
 Notes:

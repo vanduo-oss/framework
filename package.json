@@ -1,6 +1,6 @@
 {
-  "name": "vanduo-framework",
-  "version": "1.2.2",
+  "name": "@vanduo-oss/framework",
+  "version": "1.2.3",
   "description": "Zero-dependency CSS/JS framework built on Fibonacci/Golden Ratio design system with Open Color integration",
   "keywords": [
     "css",
@@ -14,10 +14,10 @@
   "homepage": "https://vanduo.dev",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Nostromo-618/vanduo-framework"
+    "url": "https://github.com/vanduo-oss/framework"
   },
   "license": "MIT",
-  "author": "Nostromo-618",
+  "author": "vanduo-oss",
   "type": "module",
   "main": "dist/vanduo.cjs.js",
   "module": "dist/vanduo.esm.js",
