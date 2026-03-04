@@ -1,16 +1,17 @@
 /**
  * Vanduo Framework - Main JavaScript File
- * v1.2.2
  */
 
 (function () {
   'use strict';
 
+  const VANDUO_VERSION = typeof __VANDUO_VERSION__ !== 'undefined' ? __VANDUO_VERSION__ : '0.0.0-dev';
+
   /**
    * Vanduo Framework Object
    */
   const Vanduo = {
-    version: '1.2.2',
+    version: VANDUO_VERSION,
     components: {},
 
     /**
@@ -51,7 +52,7 @@
         }
       });
 
-      console.log('Vanduo Framework v1.2.2 initialized');
+      console.log('Vanduo Framework v' + this.version + ' initialized');
     },
 
     /**

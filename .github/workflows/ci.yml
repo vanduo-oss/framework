@@ -48,11 +48,21 @@ jobs:
       - name: Build production assets
         run: pnpm run build
 
+      - name: Validate version consistency
+        run: pnpm run check:versions
+
       - name: Verify build output
         run: |
           ls -la dist/
+          test -f dist/build-info.json || exit 1
+          test -f dist/vanduo.css || exit 1
           test -f dist/vanduo.min.css || exit 1
+          test -f dist/vanduo.js || exit 1
           test -f dist/vanduo.min.js || exit 1
+          test -f dist/vanduo.esm.js || exit 1
+          test -f dist/vanduo.esm.min.js || exit 1
+          test -f dist/vanduo.cjs.js || exit 1
+          test -f dist/vanduo.cjs.min.js || exit 1
           echo "✅ Build artifacts verified"
 
       - name: Upload build artifacts
