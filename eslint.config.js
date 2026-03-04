@@ -44,6 +44,7 @@ export default [
 
                 // Vanduo framework globals
                 Vanduo: 'writable',
+                __VANDUO_VERSION__: 'readonly',
                 ready: 'readonly',
                 debounce: 'readonly',
                 escapeHtml: 'readonly',

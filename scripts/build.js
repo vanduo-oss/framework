@@ -5,7 +5,7 @@
 
 import { transform } from 'lightningcss';
 import * as esbuild from 'esbuild';
-import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, statSync, copyFileSync } from 'fs';
+import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, statSync, copyFileSync, rmSync } from 'fs';
 import { resolve, dirname, join, relative } from 'path';
 import { fileURLToPath } from 'url';
 import { execSync } from 'child_process';
@@ -13,16 +13,41 @@ import { execSync } from 'child_process';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const rootDir = resolve(__dirname, '..');
 const distDir = resolve(rootDir, 'dist');
-
-// Ensure dist directory exists
-if (!existsSync(distDir)) {
-    mkdirSync(distDir, { recursive: true });
-}
-
-const isMinify = process.argv.includes('--minify');
+const args = new Set(process.argv.slice(2));
+const buildModes = resolveBuildModes(args);
 
 // Read package.json for version
 const pkg = JSON.parse(readFileSync(resolve(rootDir, 'package.json'), 'utf8'));
+
+/**
+ * Resolve build modes from CLI flags.
+ * Default: build both development and production artifacts.
+ */
+function resolveBuildModes(cliArgs) {
+    const wantsMinifiedOnly = cliArgs.has('--minify');
+    const wantsDevelopmentOnly = cliArgs.has('--development') || cliArgs.has('--dev');
+
+    if (wantsMinifiedOnly && !wantsDevelopmentOnly) {
+        return ['production'];
+    }
+
+    if (wantsDevelopmentOnly && !wantsMinifiedOnly) {
+        return ['development'];
+    }
+
+    return ['development', 'production'];
+}
+
+/**
+ * Recreate dist directory from scratch.
+ */
+function resetDistDirectory() {
+    if (existsSync(distDir)) {
+        rmSync(distDir, { recursive: true, force: true });
+    }
+
+    mkdirSync(distDir, { recursive: true });
+}
 
 /**
  * Get the current git commit hash (short)
@@ -38,13 +63,12 @@ function getGitCommit() {
 /**
  * Get build info object
  */
-function getBuildInfo() {
-    const now = new Date();
+function getBuildInfo(mode, builtAt, commit) {
     return {
         version: pkg.version,
-        builtAt: now.toISOString(),
-        commit: getGitCommit(),
-        mode: isMinify ? 'production' : 'development'
+        builtAt,
+        commit,
+        mode
     };
 }
 
@@ -64,7 +88,7 @@ function writeBuildInfo(buildInfo) {
     console.log('📋 build-info.json generated');
 }
 
-console.log(`🌊 Vanduo Build ${isMinify ? '(production)' : '(development)'}`);
+console.log(`🌊 Vanduo Build (${buildModes.join(' + ')})`);
 console.log('─'.repeat(50));
 
 /**
@@ -178,7 +202,7 @@ function rewriteAssetPaths(css) {
 }
 
 // Build CSS
-async function buildCSS(banner) {
+async function buildCSS(isMinify, banner) {
     const inputPath = resolve(rootDir, 'css/vanduo.css');
     const outputPath = resolve(distDir, isMinify ? 'vanduo.min.css' : 'vanduo.css');
 
@@ -216,7 +240,7 @@ async function buildCSS(banner) {
 }
 
 // Build JS
-async function buildJS(banner) {
+async function buildJS(isMinify, banner) {
     const inputPath = resolve(rootDir, 'js/index.js');
     const outputPath = resolve(distDir, isMinify ? 'vanduo.min.js' : 'vanduo.js');
 
@@ -234,6 +258,9 @@ async function buildJS(banner) {
             // export wrapper { default: ..., __esModule: true } to a global,
             // which would shadow the real window.Vanduo object.
             target: ['es2020'],
+            define: {
+                __VANDUO_VERSION__: JSON.stringify(pkg.version)
+            },
             banner: { js: banner },
             logLevel: 'warning'
         });
@@ -248,7 +275,7 @@ async function buildJS(banner) {
 }
 
 // Build JS - ESM format (for modern bundlers)
-async function buildJSESM(banner) {
+async function buildJSESM(isMinify, banner) {
     const inputPath = resolve(rootDir, 'js/index.js');
     const outputPath = resolve(distDir, isMinify ? 'vanduo.esm.min.js' : 'vanduo.esm.js');
 
@@ -261,6 +288,9 @@ async function buildJSESM(banner) {
             outfile: outputPath,
             format: 'esm',
             target: ['es2020'],
+            define: {
+                __VANDUO_VERSION__: JSON.stringify(pkg.version)
+            },
             banner: { js: banner },
             logLevel: 'warning'
         });
@@ -275,7 +305,7 @@ async function buildJSESM(banner) {
 }
 
 // Build JS - CJS format (for Node.js/require)
-async function buildJSCJS(banner) {
+async function buildJSCJS(isMinify, banner) {
     const inputPath = resolve(rootDir, 'js/index.js');
     const outputPath = resolve(distDir, isMinify ? 'vanduo.cjs.min.js' : 'vanduo.cjs.js');
 
@@ -288,6 +318,9 @@ async function buildJSCJS(banner) {
             outfile: outputPath,
             format: 'cjs',
             target: ['es2020'],
+            define: {
+                __VANDUO_VERSION__: JSON.stringify(pkg.version)
+            },
             banner: { js: banner },
             logLevel: 'warning'
         });
@@ -303,19 +336,32 @@ async function buildJSCJS(banner) {
 
 // Run builds
 async function build() {
-    const buildInfo = getBuildInfo();
-    const banner = getBanner(buildInfo);
+    resetDistDirectory();
+
+    const builtAt = new Date().toISOString();
+    const commit = getGitCommit();
+    const combinedMode = buildModes.length === 2 ? 'development+production' : buildModes[0];
+    const buildInfo = getBuildInfo(combinedMode, builtAt, commit);
 
     console.log(`📌 Version: ${buildInfo.version} | Commit: ${buildInfo.commit}`);
     console.log('─'.repeat(50));
 
     copyAssets();
     writeBuildInfo(buildInfo);
-    await buildCSS(banner);
-    await buildJS(banner);
-    await buildJSESM(banner);
-    await buildJSCJS(banner);
-    console.log('─'.repeat(50));
+
+    for (const mode of buildModes) {
+        const isMinify = mode === 'production';
+        const modeBuildInfo = getBuildInfo(mode, builtAt, commit);
+        const banner = getBanner(modeBuildInfo);
+
+        console.log(`📦 Building ${mode} artifacts...`);
+        await buildCSS(isMinify, banner);
+        await buildJS(isMinify, banner);
+        await buildJSESM(isMinify, banner);
+        await buildJSCJS(isMinify, banner);
+        console.log('─'.repeat(50));
+    }
+
     console.log('🎉 Build complete!');
 }
 

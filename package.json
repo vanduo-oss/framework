@@ -1,6 +1,6 @@
 {
   "name": "@vanduo-oss/framework",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "description": "Zero-dependency CSS/JS framework built on Fibonacci/Golden Ratio design system with Open Color integration",
   "keywords": [
     "css",
@@ -39,8 +39,10 @@
     "icons/"
   ],
   "scripts": {
-    "build": "node scripts/build.js --minify",
-    "dev": "node scripts/build.js",
+    "build": "node scripts/build.js",
+    "build:min": "node scripts/build.js --minify",
+    "dev": "node scripts/build.js --development",
+    "check:versions": "node scripts/check-version-consistency.js",
     "release:assets": "node scripts/upload-release-assets.js",
     "lint": "pnpm run lint:css && pnpm run lint:js",
     "lint:css": "stylelint 'css/**/*.css'",

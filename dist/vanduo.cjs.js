@@ -1,4 +1,4 @@
-/*! Vanduo v1.2.0 | Built: 2026-02-22T21:30:31.940Z | git:64c88fd | development */
+/*! Vanduo v1.2.4 | Built: 2026-03-04T19:15:26.258Z | git:a524dfc | development */
 var __defProp = Object.defineProperty;
 var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __getOwnPropNames = Object.getOwnPropertyNames;
@@ -132,8 +132,9 @@ module.exports = __toCommonJS(index_exports);
 // js/vanduo.js
 (function() {
   "use strict";
+  const VANDUO_VERSION = true ? "1.2.4" : "0.0.0-dev";
   const Vanduo2 = {
-    version: "1.2.0",
+    version: VANDUO_VERSION,
     components: {},
     /**
      * Initialize framework
@@ -168,7 +169,7 @@ module.exports = __toCommonJS(index_exports);
           }
         }
       });
-      console.log("Vanduo Framework v1.2.0 initialized");
+      console.log("Vanduo Framework v" + this.version + " initialized");
     },
     /**
      * Register a component
@@ -5688,12 +5689,12 @@ module.exports = __toCommonJS(index_exports);
       const touchMoveHandler = (e) => {
         this.handleTouchMove(e, element);
       };
-      element.addEventListener("touchmove", touchMoveHandler);
+      element.addEventListener("touchmove", touchMoveHandler, { passive: false });
       cleanupFunctions.push(() => element.removeEventListener("touchmove", touchMoveHandler));
       const touchEndHandler = (e) => {
         this.handleTouchEnd(e, element);
       };
-      element.addEventListener("touchend", touchEndHandler);
+      element.addEventListener("touchend", touchEndHandler, { passive: false });
       cleanupFunctions.push(() => element.removeEventListener("touchend", touchEndHandler));
       const touchCancelHandler = (e) => {
         this.handleTouchEnd(e, element);
@@ -5899,7 +5900,7 @@ module.exports = __toCommonJS(index_exports);
       const deltaX = touch.clientX - this.touchState.startX;
       const deltaY = touch.clientY - this.touchState.startY;
       if (Math.abs(deltaX) > 10 || Math.abs(deltaY) > 10) {
-        e.preventDefault();
+        if (e.cancelable) e.preventDefault();
         if (!this.touchState.isDragging) {
           this.touchState.isDragging = true;
           element.classList.add("is-dragging");
@@ -5944,7 +5945,7 @@ module.exports = __toCommonJS(index_exports);
      */
     handleTouchEnd: function(e, element) {
       if (this.touchState && this.touchState.isDragging) {
-        e.preventDefault();
+        if (e.cancelable) e.preventDefault();
         element.classList.remove("is-dragging");
         element.classList.add("is-dropped");
         element.setAttribute("aria-grabbed", "false");
@@ -6170,6 +6171,237 @@ module.exports = __toCommonJS(index_exports);
     window.Vanduo.register("draggable", Draggable);
   }
   window.VanduoDraggable = Draggable;
+})();
+
+// js/components/lazy-load.js
+(function() {
+  "use strict";
+  const _observerMap = /* @__PURE__ */ new Map();
+  function _isSafeUrl(url) {
+    try {
+      const resolved = new URL(url, window.location.href);
+      return resolved.origin === window.location.origin;
+    } catch (_) {
+      return false;
+    }
+  }
+  function _safeInjectHtml(containerEl, html) {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html.trim(), "text/html");
+    const DANGEROUS_TAGS = ["SCRIPT", "IFRAME", "OBJECT", "EMBED", "FORM", "BASE", "LINK", "META", "STYLE"];
+    for (const tag of DANGEROUS_TAGS) {
+      const els = doc.querySelectorAll(tag);
+      for (let i = els.length - 1; i >= 0; i--) {
+        els[i].parentNode.removeChild(els[i]);
+      }
+    }
+    function _sanitizeNode(node) {
+      if (node.nodeType === Node.ELEMENT_NODE) {
+        const attrs = node.attributes;
+        for (let i = attrs.length - 1; i >= 0; i--) {
+          const attrName = attrs[i].name.toLowerCase();
+          const attrValue = attrs[i].value.toLowerCase();
+          const trimmedValue = attrValue.trim();
+          if (attrName.startsWith("on") || trimmedValue.startsWith("javascript:") || trimmedValue.startsWith("data:") || trimmedValue.startsWith("vbscript:")) {
+            node.removeAttribute(attrs[i].name);
+          }
+        }
+        const children = node.childNodes;
+        for (let i = 0; i < children.length; i++) {
+          _sanitizeNode(children[i]);
+        }
+      }
+    }
+    _sanitizeNode(doc.body);
+    const nodes = Array.from(doc.body.childNodes);
+    while (containerEl.firstChild) {
+      containerEl.removeChild(containerEl.firstChild);
+    }
+    nodes.forEach(function(node) {
+      containerEl.appendChild(document.adoptNode(node));
+    });
+  }
+  function _skeletonHtml() {
+    return '<div class="vd-skeleton-card" style="position:relative;min-height:200px;padding:2rem;overflow:hidden;"><div class="vd-skeleton vd-skeleton-heading-lg" style="margin-bottom:1.5rem;"></div><div class="vd-skeleton vd-skeleton-paragraph"><div class="vd-skeleton vd-skeleton-text"></div><div class="vd-skeleton vd-skeleton-text"></div><div class="vd-skeleton vd-skeleton-text"></div></div><div class="vd-dynamic-loader" style="position:absolute;inset:0;"><div class="vd-dynamic-loader-grid"><div class="vd-spinner vd-spinner-sm vd-spinner-success" style="animation-delay:0s;"></div><div class="vd-spinner vd-spinner-sm vd-spinner-warning" style="animation-delay:-0.15s;"></div><div class="vd-spinner vd-spinner-sm vd-spinner-error" style="animation-delay:-0.3s;"></div><div class="vd-spinner vd-spinner-sm vd-spinner-info" style="animation-delay:-0.45s;"></div></div><span class="vd-dynamic-loader-text">Loading\u2026</span></div></div>';
+  }
+  function _spinnerHtml() {
+    return '<div class="vd-dynamic-loader" style="min-height:180px;display:flex;align-items:center;justify-content:center;"><div class="vd-dynamic-loader-grid"><div class="vd-spinner vd-spinner-sm vd-spinner-success" style="animation-delay:0s;"></div><div class="vd-spinner vd-spinner-sm vd-spinner-warning" style="animation-delay:-0.15s;"></div><div class="vd-spinner vd-spinner-sm vd-spinner-error" style="animation-delay:-0.3s;"></div><div class="vd-spinner vd-spinner-sm vd-spinner-info" style="animation-delay:-0.45s;"></div></div><span class="vd-dynamic-loader-text">Loading\u2026</span></div>';
+  }
+  function _resolvePlaceholder(placeholder) {
+    if (!placeholder || placeholder === "skeleton") return _skeletonHtml();
+    if (placeholder === "spinner") return _spinnerHtml();
+    return placeholder;
+  }
+  function _dispatch(el, eventName, detail) {
+    el.dispatchEvent(new CustomEvent(eventName, { bubbles: true, detail: detail || {} }));
+  }
+  const VanduoLazyLoad = {
+    /* ─────────────────────────────────────────────────
+     * LOW-LEVEL API
+     * ───────────────────────────────────────────────── */
+    /**
+     * Observe an element. `callback` is invoked once when the element
+     * enters the viewport, then the element is automatically unobserved.
+     *
+     * @param {Element} element
+     * @param {function(Element): void} callback
+     * @param {{ threshold?: number, rootMargin?: string }} [options]
+     */
+    observe: function(element, callback, options) {
+      if (!(element instanceof Element)) {
+        console.warn("[VanduoLazyLoad] observe() requires a DOM Element.");
+        return;
+      }
+      if (typeof callback !== "function") {
+        console.warn("[VanduoLazyLoad] observe() requires a callback function.");
+        return;
+      }
+      if (_observerMap.has(element)) return;
+      const threshold = options && options.threshold != null ? options.threshold : 0;
+      const rootMargin = options && options.rootMargin ? options.rootMargin : "0px";
+      const observer = new IntersectionObserver(function(entries, obs) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            obs.unobserve(entry.target);
+            _observerMap.delete(entry.target);
+            try {
+              callback(entry.target);
+            } catch (e) {
+              console.error("[VanduoLazyLoad] Callback threw:", e);
+            }
+          }
+        });
+      }, { threshold, rootMargin });
+      _observerMap.set(element, observer);
+      observer.observe(element);
+    },
+    /**
+     * Stop observing an element that was previously passed to observe().
+     * @param {Element} element
+     */
+    unobserve: function(element) {
+      const observer = _observerMap.get(element);
+      if (observer) {
+        observer.unobserve(element);
+        _observerMap.delete(element);
+      }
+    },
+    /**
+     * Stop observing ALL currently observed elements.
+     */
+    unobserveAll: function() {
+      _observerMap.forEach(function(observer, element) {
+        observer.unobserve(element);
+      });
+      _observerMap.clear();
+    },
+    /* ─────────────────────────────────────────────────
+     * HIGH-LEVEL API
+     * ───────────────────────────────────────────────── */
+    /**
+     * Fetch an HTML partial and inject it into `containerEl` when the
+     * container enters the viewport. A placeholder is shown immediately.
+     *
+     * @param {string} url               URL of the HTML partial to fetch
+     * @param {Element} containerEl      Target element whose content will be replaced
+     * @param {{
+     *   placeholder?: 'skeleton'|'spinner'|string,
+     *   threshold?:   number,
+     *   rootMargin?:  string,
+     *   onLoaded?:    function(Element): void,
+     *   onError?:     function(Error): void
+     * }} [options]
+     */
+    loadSection: function(url, containerEl, options) {
+      if (typeof url !== "string" || !url) {
+        console.warn("[VanduoLazyLoad] loadSection() requires a non-empty URL string.");
+        return;
+      }
+      if (!(containerEl instanceof Element)) {
+        console.warn("[VanduoLazyLoad] loadSection() requires a DOM Element as containerEl.");
+        return;
+      }
+      if (!_isSafeUrl(url)) {
+        console.error("[VanduoLazyLoad] loadSection() blocked cross-origin URL:", url);
+        return;
+      }
+      const opts = options || {};
+      const placeholderHtml = _resolvePlaceholder(opts.placeholder);
+      _safeInjectHtml(containerEl, placeholderHtml);
+      _dispatch(containerEl, "lazysection:loading", { url });
+      this.observe(containerEl, function() {
+        const controller = new window.AbortController();
+        const timeoutId = setTimeout(function() {
+          controller.abort();
+        }, 1e4);
+        window.fetch(url, { signal: controller.signal }).then(function(res) {
+          clearTimeout(timeoutId);
+          if (!res.ok) throw new Error("HTTP " + res.status);
+          return res.text();
+        }).then(function(html) {
+          _safeInjectHtml(containerEl, html);
+          _dispatch(containerEl, "lazysection:loaded", { url });
+          if (typeof window.Vanduo !== "undefined") {
+            window.Vanduo.init();
+          }
+          if (typeof opts.onLoaded === "function") {
+            opts.onLoaded(containerEl);
+          }
+        }).catch(function(err) {
+          const alertEl = document.createElement("div");
+          alertEl.className = "vd-alert vd-alert-error";
+          alertEl.setAttribute("role", "alert");
+          const msgEl = document.createElement("span");
+          msgEl.textContent = "Failed to load content. ";
+          const detailEl = document.createElement("small");
+          detailEl.style.opacity = "0.7";
+          detailEl.textContent = err.message;
+          alertEl.appendChild(msgEl);
+          alertEl.appendChild(detailEl);
+          while (containerEl.firstChild) {
+            containerEl.removeChild(containerEl.firstChild);
+          }
+          containerEl.appendChild(alertEl);
+          _dispatch(containerEl, "lazysection:error", { url, error: err });
+          console.error("[VanduoLazyLoad] loadSection failed:", err);
+          if (typeof opts.onError === "function") {
+            opts.onError(err);
+          }
+        });
+      }, { threshold: opts.threshold, rootMargin: opts.rootMargin });
+    },
+    /* ─────────────────────────────────────────────────
+     * ATTRIBUTE-DRIVEN INIT
+     * ───────────────────────────────────────────────── */
+    /**
+     * Scan the DOM for [data-vd-lazy] elements and wire them up.
+     * Safe to call multiple times — already-observed elements are skipped.
+     */
+    init: function() {
+      const self = this;
+      const elements = document.querySelectorAll("[data-vd-lazy]");
+      elements.forEach(function(el) {
+        if (_observerMap.has(el) || el.dataset.vdLazyState === "loading" || el.dataset.vdLazyState === "loaded") return;
+        const url = el.getAttribute("data-vd-lazy");
+        if (!url) return;
+        el.dataset.vdLazyState = "loading";
+        const placeholder = el.getAttribute("data-vd-lazy-placeholder") || "skeleton";
+        self.loadSection(url, el, {
+          placeholder,
+          onLoaded: function() {
+            el.dataset.vdLazyState = "loaded";
+          },
+          onError: function() {
+            el.dataset.vdLazyState = "error";
+          }
+        });
+      });
+    }
+  };
+  if (typeof window.Vanduo !== "undefined") {
+    window.Vanduo.register("LazyLoad", VanduoLazyLoad);
+  }
+  window.VanduoLazyLoad = VanduoLazyLoad;
 })();
 
 // js/index.js
