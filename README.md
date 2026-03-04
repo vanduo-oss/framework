@@ -21,7 +21,7 @@
 
 A lightweight, pure HTML/CSS/JS framework for designing beautiful interfaces. Zero runtime dependencies, no mandatory build tools, just clean and simple code.
 
-[**Browse Full Documentation &rarr;**]([https://vanduo.dev/#docs](https://vanduo.dev/#docs) 
+[**Browse Full Documentation →**](https://vanduo.dev/#docs)
 
 ## Features
 
@@ -35,110 +35,75 @@ A lightweight, pure HTML/CSS/JS framework for designing beautiful interfaces. Ze
 - 🎛️ **Theme Customizer** - Real-time color, radius, font, and mode customization
 - 🔍 **SEO-Ready** - Comprehensive meta tags, structured data, and sitemap
 
-### The Vanduo Way
-Stop wrapping everything in bloated container DOMs. Build beautiful, accessible UI components with clean, predictable utility classes:
-
-```html
-<!-- Raw HTML -->
-<button>Click Me</button>
-
-<!-- With Vanduo Framework -->
-<button class="vd-btn vd-btn-primary vd-radius-full">
-  <i class="ph ph-sparkle"></i> Click Me
-</button>
-```
-
 ---
 
 ## Quick Start
 
-### Option 1: Package Manager (Recommended)
+### Option 1: CDN (Recommended)
 
-**We strongly recommend using [pnpm](https://pnpm.io/)** for installing Vanduo Framework. Vanduo is strictly configured with `.npmrc` security policies (such as blocking exotic sub-dependencies and strict peer enforcement) that work best with inside the pnpm ecosystem.
-
-```bash
-pnpm add @vanduo-oss/framework
-```
-
-*(Note: While `npm install @vanduo-oss/framework` and `yarn add @vanduo-oss/framework` will still technically work, they do not inherently enforce the same strict lockfile and isolated `node_modules` security guarantees that pnpm provides out-of-the-box).*
-
-### Option 2: CDN (Fastest)
-
-Load directly from jsDelivr — no download required:
+The quickest way to get started — no install, no build step. Add two lines to any HTML file:
 
 ```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Website</title>
-    <!-- Vanduo CSS via CDN -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/vanduo-oss/framework@main/dist/vanduo.min.css">
-</head>
-<body>
-    <!-- Your content here -->
-    
-    <!-- Vanduo JS via CDN -->
-    <script src="https://cdn.jsdelivr.net/gh/vanduo-oss/framework@main/dist/vanduo.min.js"></script>
-    <script>Vanduo.init();</script>
-</body>
-</html>
+<!-- Vanduo CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/vanduo-oss/framework@main/dist/vanduo.min.css">
+
+<!-- Vanduo JS -->
+<script src="https://cdn.jsdelivr.net/gh/vanduo-oss/framework@main/dist/vanduo.min.js"></script>
+<script>Vanduo.init();</script>
 ```
 
-**Pin to a specific version** (recommended for production):
+**Pin to a specific version** for production:
 ```html
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/vanduo-oss/framework@v1.2.3/dist/vanduo.min.css">
 <script src="https://cdn.jsdelivr.net/gh/vanduo-oss/framework@v1.2.3/dist/vanduo.min.js"></script>
 <script>Vanduo.init();</script>
 ```
 
+### Option 2: Download
 
-### Option 3: Download
-
-[**Download dist/ folder**](https://github.com/vanduo-oss/framework/tree/main/dist) and include locally:
+[**Download the dist/ folder**](https://github.com/vanduo-oss/framework/tree/main/dist) and include locally — no internet connection required at runtime:
 
 ```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Website</title>
-    <link rel="stylesheet" href="dist/vanduo.min.css">
-</head>
-<body>
-    <!-- Your content here -->
-    
-    <script src="dist/vanduo.min.js"></script>
-    <script>Vanduo.init();</script>
-</body>
-</html>
+<link rel="stylesheet" href="dist/vanduo.min.css">
+<script src="dist/vanduo.min.js"></script>
+<script>Vanduo.init();</script>
 ```
 
 The `dist/` folder is **self-contained** (CSS, JS, Fonts, Icons).
 
-### Option 4: Source Files
+### Option 3: Source Files
 
 For development or when you need more control, use the unminified source:
 
 ```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Website</title>
-    <link rel="stylesheet" href="css/vanduo.css">
-</head>
-<body>
-    <!-- Your content here -->
-    
-    <script src="js/vanduo.js"></script>
-    <script>Vanduo.init();</script>
-</body>
-</html>
+<link rel="stylesheet" href="css/vanduo.css">
+<script src="js/vanduo.js"></script>
+<script>Vanduo.init();</script>
 ```
+
+### Option 4: With a Bundler (Vite)
+
+> **Requires a build tool.** The imports below use bare module specifiers (`@vanduo-oss/framework`) which browsers cannot resolve on their own. For static HTML files, use the CDN or Download options above.
+
+Scaffold a Vite project and install Vanduo:
+
+```bash
+pnpm create vite my-app --template vanilla
+cd my-app
+pnpm add @vanduo-oss/framework
+```
+
+Import in your entry file (e.g. `main.js`):
+
+```js
+import '@vanduo-oss/framework/css';
+import { Vanduo } from '@vanduo-oss/framework';
+Vanduo.init();
+```
+
+**Why pnpm?** pnpm enforces a strict lockfile and creates an isolated `node_modules` structure. Vanduo's `.npmrc` security policies work best with pnpm out of the box.
+
+*(Note: `npm install @vanduo-oss/framework` and `yarn add @vanduo-oss/framework` will also work, but they do not enforce the same strict lockfile and isolated `node_modules` security guarantees.)*
 
 ---
 
@@ -166,7 +131,7 @@ Notes:
 
 Comprehensive documentation for all components, utilities, and customization options is available at vanduo.dev.
 
-[**View Documentation**]([https://vanduo.dev/#docs](https://vanduo.dev/#docs)
+[**View Documentation**](https://vanduo.dev/#docs)
 
 ### Key Capabilities
 

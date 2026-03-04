@@ -62,6 +62,25 @@ Set by Theme Customizer when no user preference exists:
 
 ---
 
+## Quick Start (With a Bundler — Vite)
+
+> **Bare module specifiers require a bundler.** Do NOT use `import '@vanduo-oss/framework/css'` in a plain `<script type="module">` — browsers cannot resolve bare specifiers. Use the CDN or Local options for static HTML.
+
+```bash
+pnpm create vite my-app --template vanilla
+cd my-app
+pnpm add @vanduo-oss/framework
+```
+
+```js
+// main.js
+import '@vanduo-oss/framework/css';
+import { Vanduo } from '@vanduo-oss/framework';
+Vanduo.init();
+```
+
+---
+
 ## Naming Conventions
 - **All classes**: `vd-` prefix
 - Examples:
@@ -147,6 +166,7 @@ Vanduo.components.toast.show({
 - `data-grid-toggle="#selector"`
 - `data-theme-customizer-trigger`
 - `data-draggable="value"` (used with `.vd-draggable`)
+- `data-sidenav-toggle="#css-selector"` — value **must be a CSS selector** (include the `#`); e.g. `data-sidenav-toggle="#main-sidenav"` not `data-sidenav-toggle="main-sidenav"`
 
 ---
 
